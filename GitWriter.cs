@@ -229,7 +229,7 @@ namespace GitImporter
                     if (_doNotIncludeFileContent || isEmptyFile)
                     {
                         foreach (string name in namedVersion.Names.Select(RemoveDotRoot))
-                            if (isEmptyFile)
+                            if (isEmptyFile && !_doNotIncludeFileContent)
                                 _writer.Write("M 644 inline " + name + "\ndata 0\n\n");
                             else
                             {
@@ -255,7 +255,7 @@ namespace GitImporter
                 if (_doNotIncludeFileContent || isEmptyFile)
                 {
                     foreach (string name in namedVersion.Names.Select(RemoveDotRoot))
-                        if (isEmptyFile)
+                        if (isEmptyFile && !_doNotIncludeFileContent)
                             _writer.Write("M 644 inline " + name + "\ndata 0\n\n");
                         else
                         {
