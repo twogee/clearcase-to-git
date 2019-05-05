@@ -21,6 +21,7 @@ namespace GitImporter
 
         static int Main(string[] args)
         {
+            int retVal = 0;
             Console.Error.WriteLine("GitImporter called with {0} arguments :", args.Length);
             foreach (string arg in args)
                 Console.Error.WriteLine("    " + arg);
@@ -150,13 +151,14 @@ namespace GitImporter
             {
                 Logger.TraceData(TraceEventType.Critical, 0, "Exception during import : " + ex);
                 Console.Error.WriteLine("Exception during import : " + ex);
-                return 1;
+                retVal = 1;
             }
             finally
             {
                 Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, 0, "Stop program");
                 Logger.Flush();
             }
+            return retVal;
         }
     }
 }
