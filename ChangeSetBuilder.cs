@@ -48,8 +48,15 @@ namespace GitImporter
             foreach (var namedVersion in _changeSet.Versions.ToList())
             {
                 if (namedVersion.Names.Count > 0)
-                    continue;
-
+                {
+                    if( namedVersion.Version.Element.IsSolo )
+                    {
+                        //This is the only version of this element, and it is at \main\0.
+                        // Normally we would not want to keep \main\0, but becasue this is the only element, we do keep it
+                    }else{
+                        continue;
+                    }
+                }
                 HashSet<string> elementNames;
                 if (!_elementsNames.TryGetValue(namedVersion.Version.Element, out elementNames))
                 {
@@ -58,7 +65,17 @@ namespace GitImporter
 
                     // do not consider version 0 as orphaned (meaningful only on "main", but we don't include branches' versions 0)
                     if (namedVersion.Version.VersionNumber == 0)
-                        continue;
+                    {
+                        if( namedVersion.Version.Element.IsSolo )
+                        {
+                            //This is the only version of this element, and it is at \main\0.
+                            // Normally we would not want to keep \main\0, but becasue this is the only element, we do keep it
+                        }else{
+                            continue;
+                        }
+                    }
+                    Logger.TraceData(TraceEventType.Verbose, (int)TraceId.CreateChangeSet,
+                        "Version " + namedVersion.Version + " was not yet visible in an existing directory version");
                     _orphanedVersionsByElement.AddToCollection(namedVersion.Version.Element,
                         new Tuple<string, ChangeSet.NamedVersion>(_changeSet.Branch, namedVersion));
                     // do not keep it in _changeSet.Versions : maybe the name that will be given clashes with an existing one
@@ -372,7 +389,7 @@ namespace GitImporter
                                 {
                                     _changeSet.Copied.Add(new Tuple<string, string>(renamedTo, target));
                                 }
-                                
+
                                 // it may happen that there was another element with the destination name that was removed (not renamed)
                                 // in this case the Remove would instead wrongly apply to the renamed or copied element,
                                 // but since the Rename or Copy effectively removes the old version, we can simply skip it :
