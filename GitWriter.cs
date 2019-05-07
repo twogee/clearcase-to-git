@@ -49,16 +49,18 @@ namespace GitImporter
         private readonly List<String> _roots;
         private List<String> _relativeRoots;
 
+        List<string> _prefixes = new List<String>();
         public List<Tuple<string, string>> InitialFiles { get; private set; }
 
         public List<PreWritingHook> PreWritingHooks { get; private set; }
         public List<PostWritingHook> PostWritingHooks { get; private set; }
 
-        public GitWriter(string clearcaseRoot, bool doNotIncludeFileContent, IEnumerable<string> labels, string[] roots,
+        public GitWriter(string clearcaseRoot, bool doNotIncludeFileContent, IEnumerable<string> labels, IEnumerable<string> prefixes, string[] roots,
             Dictionary<string, string> branchRename = null)
         {
             _doNotIncludeFileContent = doNotIncludeFileContent;
             _branchRename = branchRename ?? new Dictionary<string, string>();
+            _prefixes.AddRange(prefixes);
             InitialFiles = new List<Tuple<string, string>>();
             PreWritingHooks = new List<PreWritingHook>();
             PostWritingHooks = new List<PostWritingHook>();
@@ -254,10 +256,19 @@ namespace GitImporter
 
         private string RemoveDotRoot(string path)
         {
-            foreach (string root in _roots) {
-                if (path.StartsWith(root)) {
+            foreach (string root in _roots)
+            {
+                if (path.StartsWith(root))
+                {
                     path = path.Substring(root.Length);
                     break;
+                }
+            }
+            foreach (var prefix in _prefixes)
+            {
+                if (path.StartsWith(prefix))
+                {
+                    path = path.Substring(prefix.Length);
                 }
             }
             if (path.StartsWith("/")) {

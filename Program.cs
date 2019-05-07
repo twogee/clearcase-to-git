@@ -41,7 +41,7 @@ namespace GitImporter
 
                 if (!string.IsNullOrEmpty(importerArguments.FetchFileContent))
                 {
-                    using (var gitWriter = new GitWriter(importerArguments.ClearcaseRoot, importerArguments.NoFileContent, importerArguments.Labels, importerArguments.Roots))
+                    using (var gitWriter = new GitWriter(importerArguments.ClearcaseRoot, importerArguments.NoFileContent, importerArguments.Labels, importerArguments.Prefixes, importerArguments.Roots))
                     {
                         if (File.Exists(importerArguments.ThirdpartyConfig))
                         {
@@ -120,7 +120,7 @@ namespace GitImporter
                     var branchRename = historyBuilder.GetBranchRename();
                     var labels = historyBuilder.GetLabels();
 
-                    using (var gitWriter = new GitWriter(importerArguments.ClearcaseRoot, importerArguments.NoFileContent, importerArguments.Labels, importerArguments.Roots, branchRename))
+                    using (var gitWriter = new GitWriter(importerArguments.ClearcaseRoot, importerArguments.NoFileContent, importerArguments.Labels, importerArguments.Prefixes, importerArguments.Roots, branchRename))
                     {
                         if (File.Exists(importerArguments.IgnoreFile))
                             gitWriter.InitialFiles.Add(new Tuple<string, string>(".gitignore", importerArguments.IgnoreFile));
