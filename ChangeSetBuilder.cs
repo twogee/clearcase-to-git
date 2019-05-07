@@ -412,9 +412,19 @@ namespace GitImporter
                 return;
             }
             ElementVersion currentVersion;
-            if (!_elementsVersions.TryGetValue(element, out currentVersion)) {
+            if (!_elementsVersions.TryGetValue(element, out currentVersion))
+            {
                 // assumed to be (empty) version 0
-                return;
+                if (element.IsSolo)
+                {
+                    currentVersion = element.GetVersion("main", 0);
+                }
+
+                if (currentVersion == null)
+                {
+                    //but if there is exactly one on /main/0, deal with it
+                    return;
+                }
             }
 
             if (element.IsDirectory)
