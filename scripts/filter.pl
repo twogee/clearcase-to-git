@@ -19,7 +19,7 @@ my @dir_patterns = (
 my @file_patterns = (
   	# files
   	qr/README\.md/,
-  	qr/\.bak$/, # infidividual file patters
+  	qr/\.bak[@]*$/, # infidividual file patters
   	qr/[\\]ORIGINAL_SOURCE[\\]/,  # files in forbitten directories
   	qr/[\\](DATABASE|database)[\\]/,
 	qr/\.checkedout$file_ending/,
@@ -29,10 +29,12 @@ my @file_patterns = (
   	qr/[\\]cgi-logs[\\]/
 );
 my $patterns = \@dir_patterns;
+my $seen_dot = 0;
 if( $type eq 'F' ){
   $patterns = \@file_patterns;
+  $seen_dot = 1;# do not add '.@@' to the files file, only dirs file
 }
-my $seen_dot = 0;
+
 print STDERR "Removing ^$vob\\$project\r\n";
 open(my $fh, '<', $list_of_files) || die "cannot open $_";
 while(my $path = <$fh>){
