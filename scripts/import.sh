@@ -1,23 +1,32 @@
 #!/bin/bash
 
+script="$(realpath $0)"
+scriptDir="$(dirname $script)"
+export PATH=$scriptDir:"$scriptDir/scripts":$PATH
+
 set -o errexit
 set -o nounset
 
-# Edit these four values
-refDate="02-MAY-2018.06:00:00"
+# Edit these parameters
+#refDate="01-JAN-2020.06:00:00"
+refDate=`date -Iseconds`
 viewTag="some_view"
-vob="vob_name"
-view="T:\\$viewTag\\$vob"
+vobTag="vob_name"
+vobDirs="*"
+
+mvfsKey="HKLM\\SYSTEM\\CurrentControlSet\\services\\Mvfs\\Parameters"
+viewDrive="$(reg query $mvfsKey //v drive | perl -ane 'if (/drive/) { print uc pop @F }')"
+viewDir="/$viewDrive/$viewTag/$vobTag"
+viewDirWin="$viewDrive:\\$viewTag\\$vobTag"
 
 workingDir="$(pwd)"
 workingDirWin="$(pwd -W | perl -pe 's/\//\\\\/g')"
 
-
-cd "/t/$viewTag/$vob"
+cd "$viewDir"
 echo "Getting roots..."
 roots=()
 set +o nounset
-for root in *; do
+for root in $vobDirs; do
     if [ -d "$root" ] && [ "$root" != "lost+found" ]; then
         roots+=("$root")
     fi
@@ -35,7 +44,7 @@ if [ ! -d export ]; then
 fi
 
 echo "$refDate" > import-date.txt
-cd "/t/$viewTag/$vob"
+cd "$viewDir"
 
 # one clearexport_ccase for each directory, do that 1) it doesn't crash (out of memory), 2) it is parallelized
 # only od folders we can actually see. it's just to optimize
@@ -64,33 +73,34 @@ if [ $cc_export -eq 1 ]; then
             fi
         done
         echo "..."
-        sleep 60
+        sleep 15
     done
 fi
 
+cd "$viewDir"
 if [ ! -f "$workingDir/git-import/export/all_dirs" ]; then
     echo "Finding directories..."
-    cleartool find -all -type d -print > "$workingDir/git-import/export/all_dirs"
+    cleartool find -all -type d -print | sort -r > "$workingDir/git-import/export/all_dirs"
 fi
 
 if [ ! -f "$workingDir/git-import/export/all_files" ]; then
     echo "Finding files..."
-    cleartool find -all -type f -print > "$workingDir/git-import/export/all_files"
+    cleartool find -all -type f -print | sort -r > "$workingDir/git-import/export/all_files"
 fi
 
 cd "$workingDir/git-import/export"
 
 if [ ! -f to_import.dirs ]; then
-    perl ../../filter.pl all_dirs > to_import.dirs
+    perl "$scriptDir/filter.pl" all_dirs > to_import.dirs
 fi
 
 if [ ! -f to_import.files ]; then
-    perl ../../filter.pl all_files > to_import.files
+    perl "$scriptDir/filter.pl" all_files > to_import.files
 fi
 
 if [ ! -f fullVobDB.bin ]; then
-    ../../GitImporter.exe -S:fullVobDB.bin -E:to_import.files -D:to_import.dirs -C:"$view" -O:"$refDate" -G *.export
-    mv ../../GitImporter.log build_vobdb.log
+    GitImporter.exe -S:fullVobDB.bin -E:to_import.files -D:to_import.dirs -C:"$viewDirWin" -O:"$refDate" -G *.export
+    mv "$scriptDir/GitImporter.log" build_vobdb.log
 fi
 
 cd "$workingDir/git-import"
@@ -104,8 +114,8 @@ if [ ! -d git-repo ]; then
     mkdir git-repo
 fi
 
-if [ -f "../GitImporter.log" ]; then
-    rm "../GitImporter.log"
+if [ -f "$scriptDir/GitImporter.log" ]; then
+    rm "$scriptDir/GitImporter.log"
 fi
 
 for r in export/*.export; do
@@ -128,16 +138,15 @@ for r in export/*.export; do
             rm "history-$root.bin.bak"
         fi
 
-        ../GitImporter.exe -L:export/fullVobDB.bin -I:../gitignore -H:"history-$root.bin" -C:"$view" -N -R:"$view\\$root" > "to_import_full_$root"
-        mv ../GitImporter.log "create_changesets-$root.log"
+        GitImporter.exe -L:export/fullVobDB.bin -I:../gitignore -H:"history-$root.bin" -C:"$viewDirWin" -N -R:"$viewDirWin\\$root" > "to_import_full_$root"
+        mv "$scriptDir/GitImporter.log" "create_changesets-$root.log"
 
         export GIT_DIR="$workingDir/git-import/git-repo/$root"
         git init "$GIT_DIR"
         git config core.ignorecase false
 
-        ../GitImporter.exe -C:"$view" -F:"to_import_full_$root" -R:"$view\\$root" | tee /dev/null | git fast-import --export-marks="git-marks-$root.marks"
-
-        mv ../GitImporter.log "create_repo-$root.log"
+        GitImporter.exe -C:"$viewDirWin" -F:"to_import_full_$root" -R:"$viewDirWin\\$root" | tee /dev/null | git fast-import --export-marks="git-marks-$root.marks"
+        mv "$scriptDir/GitImporter.log" "create_repo-$root.log"
 
         echo "Repacking repo..."
         git repack -a -d -f
