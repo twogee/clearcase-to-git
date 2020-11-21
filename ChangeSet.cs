@@ -81,15 +81,9 @@ namespace GitImporter
         {
             get
             {
-                return Versions.Where(v => !v.Version.Element.IsDirectory && v.Names.Count > 0).Count() == 0 &&
-                    Renamed.Count == 0 &&
-                    Removed.Count == 0 &&
-                    Copied.Count == 0 &&
-                    SymLinks.Count == 0 &&
-                    Labels.Count == 0 &&
+                return IsUselessGitCommit &&
                     !IsBranchingPoint &&
                     BranchingPoint == null &&
-                    Merges.Count == 0 &&
                     !IsMerged;
             }
         }
@@ -103,7 +97,7 @@ namespace GitImporter
                     Copied.Count == 0 &&
                     Removed.Count == 0 &&
                     SymLinks.Count == 0 &&
-                    Versions.Where(v => !v.Version.Element.IsDirectory && v.Names.Count > 0).Count() == 0;
+                    Versions.Count(v => !v.Version.Element.IsDirectory && v.Names.Count > 0) == 0;
             }
         }
 
@@ -180,16 +174,12 @@ namespace GitImporter
             return result;
         }
 
-        public int VersionsCount()
-        {
-            return Versions.Where(v => !v.InRawChangeSet && v.Names.Count > 0 && !v.Version.Element.IsDirectory).Count();
-        }
-
         public string GetComment()
         {
             var interestingFileChanges = Versions.Where(v => v.InRawChangeSet && v.Names.Count > 0 && !v.Version.Element.IsDirectory).ToList();
             int nbFileChanges = interestingFileChanges.Count;
-            int nbTreeChanges = Removed.Count + Renamed.Count + Copied.Count + SymLinks.Count + VersionsCount();
+            int nbTreeChanges = Removed.Count + Renamed.Count + Copied.Count + SymLinks.Count
+                                + Versions.Count(v => !v.InRawChangeSet && v.Names.Count > 0 && !v.Version.Element.IsDirectory);
             if (nbFileChanges == 0)
                 return nbTreeChanges > 0 ? nbTreeChanges + " tree modification" + (nbTreeChanges > 1 ? "s" : "") : "No actual change";
 

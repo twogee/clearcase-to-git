@@ -503,7 +503,7 @@ namespace GitImporter
                         _labels[label].MissingVersions.RemoveFromCollection(lastVersion.Branch.BranchName, lastVersion);
                         _allLabels[label].PossiblyBroken.Add(Tuple.Create(lastVersion, (ElementVersion)null));
                         missing.Remove(lastVersion);
-                        if (missing.Count() == 0)
+                        if (!missing.Any())
                         {
                             break;
                         }
