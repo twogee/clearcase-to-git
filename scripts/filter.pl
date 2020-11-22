@@ -1,8 +1,11 @@
 #!/usr/bin/perl -n
 
+use strict;
+use warnings;
+
 BEGIN {
-    $file_ending = qr/\@\@(\\main(\\[\w\.]+)*\\\d+)?\r$/;
-    @patterns = (
+    my $file_ending = qr/\@\@(\\main(\\[\w\.]+)*\\\d+)?\r$/;
+    our @patterns = (
         # we need to know all interesting elements, even if they exist only in checkedout directories, but we skip checkedout *versions* (incremental export)
 	qr/CHECKEDOUT\r$/,
 	# general directories
@@ -18,9 +21,9 @@ BEGIN {
 	qr/\.keep$file_ending/);
 }
 
-$skip = 0;
+my $skip = 0;
 
-foreach $pattern (@patterns) {
+foreach my $pattern (@patterns) {
     if (/$pattern/) {
 	$skip = 1;
 	last;
@@ -28,6 +31,7 @@ foreach $pattern (@patterns) {
 }
 
 next if $skip;
+next if ($ENV{CC2GIT_EXCLUDES} ne "" && /$ENV{CC2GIT_EXCLUDES}/);
 
 #s/.*\\MyVob\\//;
 print
