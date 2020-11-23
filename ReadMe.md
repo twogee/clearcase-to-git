@@ -10,23 +10,23 @@ It has been tested on a ClearCase VOB with 17 years of history resulting in a Gi
 - Supports extracting subfolders in the VOB to different Git repositories.
 - Will drop useless or empty commits and labels.
 - Significantly more aggressive with merging multiple ClearCase checkins to a Git commit.
-- More aggressive with trying to keep the lables correct at a slight cost of the correctness of the history.
+- More aggressive with trying to keep the labels correct at a slight cost of the correctness of the history.
 - Imports the author and date of a label.
-- If lables are not matched properly then the Git tag will be annotated with a message.
+- If labels are not matched properly then the Git tag will be annotated with a message.
 - Better support for some edge cases, though there are still many unsoved one remaining.
-- Partial support for convering charset to UTF-8 in metadata. Filenames are known to not be converted properly.
+- Partial support for converting charset to UTF-8 in metadata. Filenames are known to not be converted properly.
 - Support for incremental imports has been dropped. It's all or nothing!
 - Renaming of files is ignored and instead it leaves everything to Git to figure out.
 
 It has only been tested with a dynamic ClearCase view. Support for thirdparties has not been tested.
 
-## General principle
+## General principles
 
 - Export as much as possible using `clearexport_ccase` (in several parts due to memory constraints of `clearexport_ccase`).
 - Get all elements (files and directories).
-- Optionally edit these lists to exclude uninteresting ones.
+- Optionally edit these lists to exclude uninteresting stuff (or use `excludes` parameter, see below).
 - Use `GitImporter` (which calls `cleartool`) to create (and save) a representation of the VOB.
-- Import with `GitImporter` and `git fast-import`. `cleartool` is then used only to get the content of files. This is done repeatedly if importing to multiple Git repositoriesm, though not more than needed.
+- Import with `GitImporter` and `git fast-import`. `cleartool` is then used only to get the content of files. This is done repeatedly if importing to multiple Git repositories, though not more than needed.
 
 ## Compiling
 
@@ -38,7 +38,7 @@ C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /debug /define:DEBUG /defi
 
 ## Usage
 
-It must be run with the Git Bash in Windows.
+This tool must be run with Git Bash on Windows.
 
 Look inside the scripts folder for an example `import.sh`. Also make sure to modify the `gitignore` file there as it will be checked in.
 
@@ -54,7 +54,7 @@ my_vob
     └── file2.txt
 ```
 
-...will be transformed to...
+... will be transformed to...
 
 ```
 somefolder/
@@ -65,4 +65,17 @@ anotherfolder/
 └── file2.txt
 ```
 
-When ready run `import.sh`. The Git repositories will be created in a folder named `git-import`.
+When you run `import.sh`, the Git repositories will be created in a folder named `git-import`.
+
+### Parameter file
+
+Since there are quite a few configuration parameters, `import.sh` can read their values from a configuration file called `ìmport.conf` in a working directory. Currently supported parameters are:
+
+- `viewTag`: view tag (mandatory)
+- `vobTag`: VOB tag (mandatory; no leading backslash required to avoid bash escaping)
+- `refDate` : upper cutoff date for import, corresponds to Origin Date in GitImporter (default: current date)
+- `vobDirs` : folders in VOB to import (default: `*`)
+- `mergeDirs` : if set to `true`, folders are merged rather than split into separate repos
+- `labels` : if set, only the specified labels are imported to Git (can be set to NONE to ignore the labels)
+- `branches` : if set, only the specified branches are imported to Git
+- `excludes` : a regexp to exclude additional subfolders or files from import on the fly (rather than editing import lists manually)
