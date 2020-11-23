@@ -11,6 +11,7 @@ namespace GitImporter
     {
         public static TraceSource Logger = Program.Logger;
 
+        private readonly DateTime _apexDate;
         private readonly DateTime _originDate;
         private readonly LabelFilter _labelFilter;
 
@@ -28,15 +29,16 @@ namespace GitImporter
 
         public IList<Element> Elements { get; private set; }
 
-        public ExportReader(string originDate, IEnumerable<string> labels)
+        public ExportReader(string apexDate, string originDate, IEnumerable<string> labels)
         {
             Elements = new List<Element>();
+            _apexDate = string.IsNullOrEmpty(originDate) ?  _epoch : DateTime.Parse(apexDate).ToUniversalTime();
             _originDate = string.IsNullOrEmpty(originDate) ? DateTime.UtcNow : DateTime.Parse(originDate).ToUniversalTime();
             _labelFilter = new LabelFilter(labels);
         }
 
         /// <summary>
-        /// Semantic of the file parameter is that the "directory" part (if present) is the path relative to the global clearcase root
+        /// Semantic of the file parameter is that the "directory" part (if present) is the path relative to the global ClearCase root
         /// the file itself should therefore be in the working directory
         /// (although we could cheat using '/' for the root vs '\' for the actual file path)
         /// </summary>
@@ -111,8 +113,8 @@ namespace GitImporter
                     {
                         var version = merge.Item1;
                         var other = currentElement.GetVersion(merge.Item2, merge.Item3);
-                        if (other == null || version.Date > _originDate)
-                            // skip merges to or from skipped versions (that were too recent)
+                        if (other == null || version.Date > _originDate || version.Date < _apexDate)
+                            // skip merges to or from skipped versions (that were too recent or old)
                             continue;
                         (merge.Item4 ? version.MergesTo : version.MergesFrom).Add(other);
                     }
@@ -155,10 +157,12 @@ namespace GitImporter
                 if (currentVersion != null && (match = _timeRegex.Match(line)).Success)
                 {
                     currentVersion.Date = _epoch.AddSeconds(long.Parse(match.Groups[1].Value));
-                    if (currentVersion.Date > _originDate)
+                    if (currentVersion.Date > _originDate || currentVersion.Date < _apexDate)
                     {
                         Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadExport,
-                            string.Format("Skipping version {0} : {1} > {2}", currentVersion, currentVersion.Date, _originDate));
+                            (currentVersion.Date > _originDate)
+                                ? string.Format("Skipping version {0} : {1} > {2}", currentVersion, currentVersion.Date, _originDate)
+                                :  string.Format("Skipping version {0} : {1} < {2}", currentVersion, currentVersion.Date, _apexDate));
                         currentBranch.Versions.Remove(currentVersion);
                     }
                     continue;

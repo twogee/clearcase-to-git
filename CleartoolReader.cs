@@ -18,6 +18,7 @@ namespace GitImporter
 
         private const int _nbCleartool = 10;
         private readonly Cleartool[] _cleartools;
+        private readonly DateTime _apexDate;
         private readonly DateTime _originDate;
 
         public Dictionary<string, Element> ElementsByOid { get; private set; }
@@ -28,13 +29,14 @@ namespace GitImporter
 
         private readonly Dictionary<string, LabelMeta> _labelMetas = new Dictionary<string, LabelMeta>();
 
-        public CleartoolReader(string clearcaseRoot, string originDate, IEnumerable<string> labels)
+        public CleartoolReader(string clearcaseRoot, string apexDate, string originDate, IEnumerable<string> labels)
         {
             var labelFilter = new LabelFilter(labels);
             _cleartools = new Cleartool[_nbCleartool];
             for (int i = 0; i < _nbCleartool; i++)
                 _cleartools[i] = new Cleartool(clearcaseRoot, labelFilter);
 
+            _apexDate = string.IsNullOrEmpty(apexDate) ? new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc) : DateTime.Parse(apexDate).ToUniversalTime();
             _originDate = string.IsNullOrEmpty(originDate) ? DateTime.UtcNow : DateTime.Parse(originDate).ToUniversalTime();
         }
 
@@ -66,7 +68,7 @@ namespace GitImporter
                         currentElement.Oid = oid;
                         lock (ElementsByOid)
                             ElementsByOid[oid] = currentElement;
-                        // these elements come from a non-filtered clearcase export : there may be unwanted elements
+                        // these elements come from a non-filtered ClearCase export : there may be unwanted elements
                         lock (_oidsToCheck)
                             _oidsToCheck.Add(oid);
                     });
@@ -196,25 +198,25 @@ namespace GitImporter
             {
                 int iTask = ++task;
                 labelActions.Add(() =>
-                    {
-                        if (iTask % 100 == 0)
-                            Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Reading label meta info " + iTask);
-                        string author;
-                        string login;
-                        DateTime date;
+                {
+                    if (iTask % 100 == 0)
+                        Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Reading label meta info " + iTask);
+                    string author;
+                    string login;
+                    DateTime date;
 
-                        var cleartool = _cleartools[task % _nbCleartool];
-                        lock (cleartool)
-                            cleartool.GetLabelDetails(label, out author, out login, out date);
+                    var cleartool = _cleartools[task % _nbCleartool]; 
+                    lock (cleartool)
+                        cleartool.GetLabelDetails(label, out author, out login, out date);
 
-                        LabelMeta labelMeta = new LabelMeta();
-                        labelMeta.Name = label;
-                        labelMeta.AuthorName = author;
-                        labelMeta.AuthorLogin = login;
-                        labelMeta.Created = date;
+                    LabelMeta labelMeta = new LabelMeta();
+                    labelMeta.Name = label;
+                    labelMeta.AuthorName = author;
+                    labelMeta.AuthorLogin = login;
+                    labelMeta.Created = date;
 
-                        lock (_labelMetas)
-                            _labelMetas[label] = labelMeta;
+                    lock (_labelMetas)
+                        _labelMetas[label] = labelMeta;
                 });
             }
             Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _nbCleartool * 2 }, labelActions.ToArray());
@@ -225,6 +227,12 @@ namespace GitImporter
 
         private void ReadElement(string elementName, bool isDir, Cleartool cleartool)
         {
+            bool fudgeDate = false;
+            if (elementName.EndsWith("!"))
+            {
+                elementName = elementName.Substring(0, elementName.Length - 1);
+                fudgeDate = true;
+            }
             // canonical name of elements is without the trailing '@@'
             if (elementName.EndsWith("@@"))
                 elementName = elementName.Substring(0, elementName.Length - 2);
@@ -287,7 +295,7 @@ namespace GitImporter
                             string skippedName = versionPath[index];
                             ElementBranch skippedBranch = new ElementBranch(element, skippedName, branchingPoint);
                             element.Branches[skippedName] = skippedBranch;
-                            if (!AddVersionToBranch(skippedBranch, 0, isDir, null, cleartool)) {
+                            if (!AddVersionToBranch(skippedBranch, 0, isDir, fudgeDate, null, cleartool)) {
                                 throw new Exception("Failed to add missing branch " + skippedName + " for element " + elementName + "!");
                             }
                             branchingPoint = skippedBranch.Versions.Last();
@@ -296,7 +304,7 @@ namespace GitImporter
                     branch = new ElementBranch(element, branchName, branchingPoint);
                     element.Branches[branchName] = branch;
                 }
-                bool added = AddVersionToBranch(branch, versionNumber, isDir, null, cleartool);
+                bool added = AddVersionToBranch(branch, versionNumber, isDir, fudgeDate, null, cleartool);
                 if (!added)
                 {
                     // versions was too recent
@@ -310,7 +318,7 @@ namespace GitImporter
             Logger.TraceData(TraceEventType.Stop | TraceEventType.Verbose, (int)TraceId.ReadCleartool, "Stop reading element", elementName);
         }
 
-        private bool AddVersionToBranch(ElementBranch branch, int versionNumber, bool isDir, List<ElementVersion> newVersions, Cleartool cleartool)
+        private bool AddVersionToBranch(ElementBranch branch, int versionNumber, bool isDir, bool fudgeDate, List<ElementVersion> newVersions, Cleartool cleartool)
         {
             ElementVersion version;
             if (isDir)
@@ -346,6 +354,8 @@ namespace GitImporter
             List<Tuple<string, int>> mergesTo, mergesFrom;
             lock (cleartool)
                 cleartool.GetVersionDetails(version, out mergesTo, out mergesFrom);
+            if (fudgeDate)
+                version.Date = _apexDate;
             if (mergesTo != null)
                 foreach (var merge in mergesTo)
                     // only merges between branches are interesting
@@ -377,7 +387,7 @@ namespace GitImporter
             Match match = _versionRegex.Match(version);
             if (!match.Success)
             {
-                Logger.TraceData(TraceEventType.Warning, (int)TraceId.ReadCleartool, "Could not parse '" + version + "' as a clearcase version");
+                Logger.TraceData(TraceEventType.Warning, (int)TraceId.ReadCleartool, "Could not parse '" + version + "' as a ClearCase version");
                 return;
             }
 
@@ -410,7 +420,7 @@ namespace GitImporter
             string[] versionPath = match.Groups[2].Value.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
             string branchName = versionPath[versionPath.Length - 2];
             int versionNumber = int.Parse(versionPath[versionPath.Length - 1]);
-            // since we call ourself recursively to check the previous version, we first check the recursion end condition
+            // since we call ourselves recursively to check the previous version, we first check the recursion end condition
             ElementBranch branch;
             if (element.Branches.TryGetValue(branchName, out branch) && branch.Versions.Count > 0 &&
                 branch.Versions.Last().VersionNumber >= versionNumber)
@@ -454,8 +464,10 @@ namespace GitImporter
                 branch = new ElementBranch(element, branchName, branchingPoint);
                 element.Branches[branchName] = branch;
             }
-            
-            bool added = AddVersionToBranch(branch, versionNumber, isDir, newVersions, cleartool);
+
+            // set date to _apexDate for all elements that have date /main/0 set to _apexDate
+            bool fudgeDate = element.GetVersion("main", 0).Date == _apexDate;
+            bool added = AddVersionToBranch(branch, versionNumber, isDir, fudgeDate, newVersions, cleartool);
             if (!added && branch.Versions.Count == 0)
                 // do not leave an empty branch
                 element.Branches.Remove(branchName);

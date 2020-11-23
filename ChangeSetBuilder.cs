@@ -156,7 +156,7 @@ namespace GitImporter
             // but it is still in the ElementBranch.Versions
             var previousVersion = (DirectoryVersion)version.GetPreviousVersion();
             // however, if this is indeed the branching point, then previousVersion may
-            // not correspond to what is currently in the branch, because clearcase branches
+            // not correspond to what is currently in the branch, because ClearCase branches
             // are independent for different elements
             // we don't always use _oldVersions because there may be several successive versions in a single ChangeSet
             if (previousVersion.VersionNumber == 0)

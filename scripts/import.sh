@@ -14,6 +14,7 @@ workingDirWin="$(pwd -W | perl -pe 's/\//\\\\/g')"
 viewTag=
 vobTag=
 refDate=
+topDate=
 vobDirs=
 mergeDirs=
 prefixes=
@@ -44,6 +45,10 @@ viewDirWin="$viewDrive:\\$viewTag\\$vobTag"
 # default values
 if [ -z "$refDate" ]; then
     refDate="$(date -Iseconds)"
+fi
+
+if [ -z "$topDate" ]; then
+    topDate="$(cleartool descr -fmt %d "$viewDirWin\\.@@/main/0")"
 fi
 
 if [ -z "$vobDirs" ]; then
@@ -171,7 +176,7 @@ if [ ! -f to_import.files ]; then
 fi
 
 if [ ! -f fullVobDB.bin ]; then
-    GitImporter.exe -S:fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -E:to_import.files -D:to_import.dirs -C:"$viewDirWin" -O:"$refDate" -G *.export
+    GitImporter.exe -S:fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -E:to_import.files -D:to_import.dirs -C:"$viewDirWin" -O:"$refDate"  -A:"$topDate" -G *.export
     mv "$scriptDir/GitImporter.log" build_vobdb.log
 fi
 

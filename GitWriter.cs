@@ -208,7 +208,7 @@ namespace GitImporter
                         continue;
                     }
 
-                    InlineClearcaseFileVersion(namedVersion.Version.Element.Name, namedVersion.Version.Element.Oid, namedVersion.Version.VersionPath, namedVersion.Names.Select(RemoveDotRoot), true);
+                    InlineClearCaseFileVersion(namedVersion.Version.Element.Name, namedVersion.Version.Element.Oid, namedVersion.Version.VersionPath, namedVersion.Names.Select(RemoveDotRoot), true);
                 }
             }
 
@@ -291,7 +291,7 @@ namespace GitImporter
             return path.StartsWith("./") ? path.Substring(2) : path;
         }
 
-        private void InlineClearcaseFileVersion(string elementPath, string elementOid, string version, IEnumerable<string> names, bool writeNames)
+        private void InlineClearCaseFileVersion(string elementPath, string elementOid, string version, IEnumerable<string> names, bool writeNames)
         {
             string fullName = elementPath + "@@" + version;
             string fileName = _cleartool.Get(fullName);
@@ -309,21 +309,21 @@ namespace GitImporter
                     fileInfo = new FileInfo(fileName);
                 }
                 else
-                    Logger.TraceData(TraceEventType.Warning, (int)TraceId.ApplyChangeSet, "Element with oid " + elementOid + " could not be found in clearcase");
+                    Logger.TraceData(TraceEventType.Warning, (int)TraceId.ApplyChangeSet, "Element with oid " + elementOid + " could not be found in ClearCase");
             }
             if (!fileInfo.Exists)
             {
-                Logger.TraceData(TraceEventType.Warning, (int)TraceId.ApplyChangeSet, "Version " + fullName + " could not be read from clearcase");
+                Logger.TraceData(TraceEventType.Warning, (int)TraceId.ApplyChangeSet, "Version " + fullName + " could not be read from ClearCase");
                 // still create a file for later delete or rename
                 foreach (string name in names)
                 {
                     if (writeNames)
                         _writer.Write("M 644 inline " + name + "\n");
-                    InlineString("// clearcase error while retrieving " + fullName);
+                    InlineString("// ClearCase error while retrieving " + fullName);
                 }
                 return;
             }
-            // clearcase always creates as ReadOnly
+            // ClearCase always creates as ReadOnly
             fileInfo.IsReadOnly = false;
             foreach (string name in names)
             {
@@ -405,7 +405,7 @@ namespace GitImporter
                     int pos = versionToFetch.LastIndexOf("@@");
                     string elementPath = versionToFetch.Substring(0, pos);
                     string versionPath = versionToFetch.Substring(pos + 2);
-                    InlineClearcaseFileVersion(elementPath, elementOid, versionPath, new[] { name.Substring(1) }, false);
+                    InlineClearCaseFileVersion(elementPath, elementOid, versionPath, new[] { name.Substring(1) }, false);
                     currentLine.Clear();
                     index = 0;
                 }

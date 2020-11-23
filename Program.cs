@@ -64,11 +64,11 @@ namespace GitImporter
                                 vobDB = Serializer.Deserialize<VobDB>(stream);
                             else
                                 vobDB.Add(Serializer.Deserialize<VobDB>(stream));
-                        Logger.TraceData(TraceEventType.Information, 0, "Clearcase data successfully loaded from " + vobDBFile);
+                        Logger.TraceData(TraceEventType.Information, 0, "ClearCase data successfully loaded from " + vobDBFile);
                     }
                 }
 
-                var exportReader = new ExportReader(importerArguments.OriginDate, importerArguments.Labels);
+                var exportReader = new ExportReader(importerArguments.ApexDate, importerArguments.OriginDate, importerArguments.Labels);
                 foreach (var file in importerArguments.ExportFiles)
                     exportReader.ReadFile(file);
 
@@ -77,7 +77,7 @@ namespace GitImporter
                 if (!string.IsNullOrWhiteSpace(importerArguments.DirectoriesFile) ||
                     !string.IsNullOrWhiteSpace(importerArguments.ElementsFile) ||
                     !string.IsNullOrWhiteSpace(importerArguments.VersionsFile))
-                    using (var cleartoolReader = new CleartoolReader(importerArguments.ClearcaseRoot, importerArguments.OriginDate, importerArguments.Labels))
+                    using (var cleartoolReader = new CleartoolReader(importerArguments.ClearcaseRoot, importerArguments.ApexDate, importerArguments.OriginDate, importerArguments.Labels))
                     {
                         cleartoolReader.Init(vobDB, exportReader.Elements);
                         // first save of exportReader with oid (if something was actually read)
@@ -86,7 +86,7 @@ namespace GitImporter
                         {
                             using (var stream = new FileStream(importerArguments.SaveVobDB + ".export_oid", FileMode.Create))
                                 Serializer.Serialize(stream, vobDB);
-                            Logger.TraceData(TraceEventType.Information, 0, "Clearcase export with oid successfully saved in " + importerArguments.SaveVobDB + ".export_oid");
+                            Logger.TraceData(TraceEventType.Information, 0, "ClearCase export with oid successfully saved in " + importerArguments.SaveVobDB + ".export_oid");
                         }
                         newVersions = cleartoolReader.Read(importerArguments.DirectoriesFile, importerArguments.ElementsFile, importerArguments.VersionsFile);
                         vobDB = cleartoolReader.VobDB;
@@ -94,7 +94,7 @@ namespace GitImporter
                         {
                             using (var stream = new FileStream(importerArguments.SaveVobDB, FileMode.Create))
                                 Serializer.Serialize(stream, vobDB);
-                            Logger.TraceData(TraceEventType.Information, 0, "Clearcase data successfully saved in " + importerArguments.SaveVobDB);
+                            Logger.TraceData(TraceEventType.Information, 0, "ClearCase data successfully saved in " + importerArguments.SaveVobDB);
                         }
                     }
 
