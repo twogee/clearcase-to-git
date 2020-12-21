@@ -31,7 +31,7 @@ foreach my $pattern (@patterns) {
 }
 
 next if $skip;
-next if ($ENV{CC2GIT_EXCLUDES} ne "" && /$ENV{CC2GIT_EXCLUDES}/);
+next if ($ENV{CC2GIT_EXCLUDES} ne "" && m!$ENV{CC2GIT_EXCLUDES}!);
 
 #s/.*\\MyVob\\//;
 print

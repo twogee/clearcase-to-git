@@ -122,15 +122,14 @@ fi
 cd "$workingDir/git-import/export"
 if [ $cc_export -eq 1 ]; then
     working=1
+    echo -n "Waiting for "
     while [ $working ]; do
         working=
-        echo -n "Waiting for"
         for f in *.export; do
             # clearcase export files are empty until everything is finished
             if [ ! -s "$f" ]; then
                 working=1
-            else
-                echo -n " ${f%.export}"
+                echo -n "${f%.export}"
             fi
         done
         echo -n "..."
@@ -142,12 +141,12 @@ fi
 cd "$viewDir"
 if [ ! -f "$workingDir/git-import/export/all_dirs" ]; then
     echo "Finding directories..."
-    cleartool find -all -type d -print | sort -r > "$workingDir/git-import/export/all_dirs"
+    cleartool find -all -type d -print | LC_ALL=C sort -r > "$workingDir/git-import/export/all_dirs"
 fi
 
 if [ ! -f "$workingDir/git-import/export/all_files" ]; then
     echo "Finding files..."
-    cleartool find -all -type f -print | sort -r > "$workingDir/git-import/export/all_files"
+    cleartool find -all -type f -print | LC_ALL=C sort -r > "$workingDir/git-import/export/all_files"
 fi
 
 cd "$workingDir/git-import/export"

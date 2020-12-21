@@ -13,8 +13,8 @@ It has been tested on a ClearCase VOB with 17 years of history resulting in a Gi
 - More aggressive with trying to keep the labels correct at a slight cost of the correctness of the history.
 - Imports the author and date of a label.
 - If labels are not matched properly then the Git tag will be annotated with a message.
-- Better support for some edge cases, though there are still many unsoved one remaining.
-- Partial support for converting charset to UTF-8 in metadata. Filenames are known to not be converted properly.
+- Better support for some edge cases, though there are still many unsolved ones remaining.
+- Partial support for converting charset to UTF-8 in metadata. Filenames are known to not be converted properly. Non-ASCII characters in branches and labels can result in mojibake and eventual crash.
 - Support for incremental imports has been dropped. It's all or nothing!
 - Renaming of files is ignored and instead it leaves everything to Git to figure out.
 
@@ -74,8 +74,10 @@ Since there are quite a few configuration parameters, `import.sh` can read their
 - `viewTag`: view tag (mandatory)
 - `vobTag`: VOB tag (mandatory; no leading backslash required to avoid bash escaping)
 - `refDate` : upper cutoff date for import, corresponds to Origin Date in GitImporter (default: current date)
-- `vobDirs` : folders in VOB to import (default: `*`)
+- `vobDirs` : folders in VOB to import, glob expressions can be used (default: `*`)
 - `mergeDirs` : if set to `true`, folders are merged rather than split into separate repos
-- `labels` : if set, only the specified labels are imported to Git (can be set to NONE to ignore the labels)
+- `labels` : if set, only the specified labels are imported to Git (can be set to `NONE` to ignore the labels)
 - `branches` : if set, only the specified branches are imported to Git
 - `excludes` : a regexp to exclude additional subfolders or files from import on the fly (rather than editing import lists manually)
+
+`vobDirs`, `labels` and `branches` can also be specified as quoted space-separated list (e.g. `"A B"`).
