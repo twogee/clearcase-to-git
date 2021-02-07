@@ -97,13 +97,22 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="scripts\cleartool_tty.exe">
+    <ContentWithTargetPath Include="scripts\cleartool_tty.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>cleartool_tty.exe</TargetPath>
+    </ContentWithTargetPath>
+    <Content Include="ReadMe.md" />
+    <ContentWithTargetPath Include="scripts\filter.pl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>filter.pl</TargetPath>
+    </ContentWithTargetPath>
+    <Content Include="scripts\gitignore">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="ReadMe.md" />
-    <Content Include="scripts\filter.pl" />
-    <Content Include="scripts\gitignore" />
-    <Content Include="scripts\import.sh" />
+    <ContentWithTargetPath Include="scripts\import.sh">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>import.sh</TargetPath>
+    </ContentWithTargetPath>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
