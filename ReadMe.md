@@ -40,7 +40,7 @@ C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe /debug /define:DEBUG /defi
 
 This tool must be run with Git Bash on Windows.
 
-Look inside the scripts folder for an example `import.sh`. Also make sure to modify the `gitignore` file there as it will be checked in.
+Please look inside the `scripts` folder and investigate `import.sh`; this is the wrapper that executes both export and import processes in one go. Also make sure to copy the `gitignore` file to a working directory (where you can also create a parameter file, [see below](#parameter-file)) and modify it according to your needs in order to check it in automagically.
 
 The provided `import.sh` will take a VOB and create several Git repositories from it, assuming all folders in the VOB are equivalent to different Git repositories.
 

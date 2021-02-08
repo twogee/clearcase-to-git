@@ -2,7 +2,7 @@
 
 script="$(realpath "$0")"
 scriptDir="$(dirname "$script")"
-export PATH=$scriptDir:"$scriptDir/scripts":$PATH
+export PATH=$scriptDir:$PATH
 
 set -o errexit
 set -o nounset
@@ -61,20 +61,20 @@ set -o nounset
 
 # prep the setup
 labelList=()
-if [ ! -z "$labels" ]; then
+if [ -n "$labels" ]; then
     for label in $labels; do
         labelList+=("-Labels:$label")
     done
 fi
 
 branchList=()
-if [ ! -z "$branches" ]; then
+if [ -n "$branches" ]; then
     for branch in $branches; do
         branchList+=("-Branches:$branch")
     done
 fi
 
-if [ ! -z "$excludes" ]; then
+if [ -n "$excludes" ]; then
     export CC2GIT_EXCLUDES="$excludes"
 fi
 
@@ -200,7 +200,7 @@ if [ -z "${mergeDirs}" ]; then
                 rm "history-$root.bin.bak"
             fi
 
-            GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:../gitignore -H:"history-$root.bin" -C:"$viewDirWin" -N -R:"$viewDirWin\\$root" > "to_import_full_$root"
+            GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$root.bin" -C:"$viewDirWin" -N -R:"$viewDirWin\\$root" > "to_import_full_$root"
             mv "$scriptDir/GitImporter.log" "create_changesets-$root.log"
 
             export GIT_DIR="$workingDir/git-import/git-repo/$root"
@@ -233,7 +233,7 @@ else
             rm "history-$vobTag.bin.bak"
         fi
 
-        GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:../gitignore -H:"history-$vobTag.bin" -C:"$viewDirWin" -N "${rootList[@]}" > "to_import_full_$vobTag"
+        GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$vobTag.bin" -C:"$viewDirWin" -N "${rootList[@]}" > "to_import_full_$vobTag"
         mv "$scriptDir/GitImporter.log" "create_changesets-$vobTag.log"
 
         export GIT_DIR="$workingDir/git-import/git-repo/$vobTag"

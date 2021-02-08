@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
+our @patterns;
+
 BEGIN {
     my $file_ending = qr/\@\@(\\main(\\[\w\.]+)*\\\d+)?\r$/;
-    our @patterns = (
+    @patterns = (
         # we need to know all interesting elements, even if they exist only in checkedout directories, but we skip checkedout *versions* (incremental export)
 	qr/CHECKEDOUT\r$/,
 	# general directories
@@ -31,7 +33,7 @@ foreach my $pattern (@patterns) {
 }
 
 next if $skip;
-next if ($ENV{CC2GIT_EXCLUDES} ne "" && m!$ENV{CC2GIT_EXCLUDES}!);
+next if (exists $ENV{CC2GIT_EXCLUDES} && $ENV{CC2GIT_EXCLUDES} ne "" && m!$ENV{CC2GIT_EXCLUDES}!);
 
 #s/.*\\MyVob\\//;
 print
