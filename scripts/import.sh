@@ -33,6 +33,9 @@ if [ -z "$viewTag" ] || [ -z "$vobTag" ]; then
     exit 1
 fi
 
+cleartool startview "$viewTag"
+[ "$(cleartool lsvob \\"$vobTag" | wc -w)" -eq 3 ] && cleartool mount \\"$vobTag"
+
 mvfsKey="HKLM\\SYSTEM\\CurrentControlSet\\services\\Mvfs\\Parameters"
 viewDrive="$(reg query $mvfsKey //v drive | perl -ane 'if (/drive/) { print uc pop @F }')"
 viewDir="/$viewDrive/$viewTag/$vobTag"
