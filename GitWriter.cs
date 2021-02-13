@@ -44,10 +44,12 @@ namespace GitImporter
         private readonly bool _doNotIncludeFileContent;
         private bool _initialFilesAdded;
         private bool _isIncremental;
+        private bool _trimRoots;
         private readonly HashSet<string> _startedBranches = new HashSet<string>();
         private readonly Dictionary<string, string> _branchRename;
         private readonly List<String> _roots;
         private List<String> _relativeRoots;
+        private string ClearcaseRoot;
 
         List<string> _prefixes = new List<String>();
         public List<Tuple<string, string>> InitialFiles { get; private set; }
@@ -55,15 +57,17 @@ namespace GitImporter
         public List<PreWritingHook> PreWritingHooks { get; private set; }
         public List<PostWritingHook> PostWritingHooks { get; private set; }
 
-        public GitWriter(string clearcaseRoot, bool doNotIncludeFileContent, IEnumerable<string> labels, IEnumerable<string> prefixes, string[] roots,
+        public GitWriter(string clearcaseRoot, bool trimRoots, bool doNotIncludeFileContent, IEnumerable<string> labels, IEnumerable<string> prefixes, string[] roots,
             Dictionary<string, string> branchRename = null)
         {
+            _trimRoots = trimRoots;
             _doNotIncludeFileContent = doNotIncludeFileContent;
             _branchRename = branchRename ?? new Dictionary<string, string>();
             _prefixes.AddRange(prefixes);
             InitialFiles = new List<Tuple<string, string>>();
             PreWritingHooks = new List<PreWritingHook>();
             PostWritingHooks = new List<PostWritingHook>();
+            ClearcaseRoot = clearcaseRoot.Replace("\\", "/");
             _roots = new List<string>(roots).Select(r => r.Replace("\\", "/")).ToList();
             _relativeRoots = roots.Where(r => r != ".").Select(r => {
                 if (r.StartsWith(clearcaseRoot)) {
@@ -256,12 +260,22 @@ namespace GitImporter
 
         private string RemoveDotRoot(string path)
         {
-            foreach (string root in _roots)
+            if (_trimRoots)
             {
-                if (path.StartsWith(root))
+                foreach (string root in _roots)
                 {
-                    path = path.Substring(root.Length);
-                    break;
+                    if (path.StartsWith(root))
+                    {
+                        path = path.Substring(root.Length);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (path.StartsWith(ClearcaseRoot))
+                {
+                    path = path.Substring(ClearcaseRoot.Length);
                 }
             }
             foreach (var prefix in _prefixes)
