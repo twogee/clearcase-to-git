@@ -21,7 +21,7 @@ namespace GitImporter
         public bool TrimRoots;
         [Argument(ArgumentType.MultipleUnique, HelpText = "Roots : directory elements whose parents are not imported.", DefaultValue = new string[0])]
         public string[] Roots;
-        [Argument(ArgumentType.MultipleUnique, HelpText = "Prefixes : Prefix(es) to remove from paths when building output files", DefaultValue = new[] { "." })]
+        [Argument(ArgumentType.MultipleUnique, HelpText = "Prefix(es) to remove from paths when building output files", DefaultValue = new[] { "." })]
         public string[] Prefixes;
         [Argument(ArgumentType.MultipleUnique, HelpText = "Branches to import (may be a regular expression).", DefaultValue = new[] { ".*" })]
         public string[] Branches;
