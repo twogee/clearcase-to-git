@@ -174,6 +174,11 @@ namespace GitImporter
             _labels = _rawHistoryBuilder.Labels;
             _allLabels = new Dictionary<string, LabelInfo>(_labels);
             List<ChangeSet> result = ProcessElementNames();
+            foreach (var cs in result.Where(c => c.Branch == null))
+            {
+                Logger.TraceData(TraceEventType.Verbose, (int)TraceId.ApplyChangeSet, "ChangeSet", cs.Id, "has no branch");
+            }
+            result.RemoveAll(c => c.Branch == null);
             return CleanupHistory(result);
         }
 
