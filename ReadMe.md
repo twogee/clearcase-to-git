@@ -75,9 +75,10 @@ Since there are quite a few configuration parameters, `import.sh` can read their
 - `vobTag`: VOB tag (mandatory; no leading backslash required to avoid bash escaping)
 - `refDate` : upper cutoff date for import, corresponds to Origin Date in GitImporter (default: current date)
 - `vobDirs` : folders in VOB to import, glob expressions can be used (default: `*`)
-- `mergeDirs` : if set to `true`, folders are merged rather than split into separate repos
+- `mergeDirs` : if set to `true`, folders are merged rather than split into separate repos; in this case, `vobDirs` are not removed from paths in Git and `prefixes` can be used to manipulate the resulting paths
+- `prefixes` : if set, prefixes are trimmed from paths in Git; NB! trimming happens *after* `vobDirs` are removed, which is the default behaviour when `vobDirs` contains a single folder
 - `labels` : if set, only the specified labels are imported to Git (can be set to `NONE` to ignore the labels)
 - `branches` : if set, only the specified branches are imported to Git
 - `excludes` : a regexp to exclude additional subfolders or files from import on the fly (rather than editing import lists manually)
 
-`vobDirs`, `labels` and `branches` can also be specified as quoted space-separated list (e.g. `"A B"`).
+`vobDirs`, `prefixes`, `labels` and `branches` can also be specified as quoted space-separated list (e.g. `"A B"`).

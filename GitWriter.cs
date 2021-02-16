@@ -36,7 +36,7 @@ namespace GitImporter
 
         public static TraceSource Logger = Program.Logger;
 
-        private static readonly DateTime _epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        private static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
         private readonly StreamWriter _writer = new StreamWriter(Console.OpenStandardOutput());
         private readonly Cleartool _cleartool;
@@ -44,26 +44,32 @@ namespace GitImporter
         private readonly bool _doNotIncludeFileContent;
         private bool _initialFilesAdded;
         private bool _isIncremental;
+        private bool _trimRoots;
         private readonly HashSet<string> _startedBranches = new HashSet<string>();
         private readonly Dictionary<string, string> _branchRename;
-        private readonly List<String> Roots;
-        private List<String> RelativeRoots;
+        private readonly List<String> _roots;
+        private List<String> _relativeRoots;
+        private string ClearcaseRoot;
 
+        List<string> _prefixes = new List<String>();
         public List<Tuple<string, string>> InitialFiles { get; private set; }
 
         public List<PreWritingHook> PreWritingHooks { get; private set; }
         public List<PostWritingHook> PostWritingHooks { get; private set; }
 
-        public GitWriter(string clearcaseRoot, bool doNotIncludeFileContent, IEnumerable<string> labels, string[] roots,
+        public GitWriter(string clearcaseRoot, bool trimRoots, bool doNotIncludeFileContent, IEnumerable<string> labels, IEnumerable<string> prefixes, string[] roots,
             Dictionary<string, string> branchRename = null)
         {
+            _trimRoots = trimRoots;
             _doNotIncludeFileContent = doNotIncludeFileContent;
             _branchRename = branchRename ?? new Dictionary<string, string>();
+            _prefixes.AddRange(prefixes);
             InitialFiles = new List<Tuple<string, string>>();
             PreWritingHooks = new List<PreWritingHook>();
             PostWritingHooks = new List<PostWritingHook>();
-            Roots = new List<string>(roots).Select(r => r.Replace("\\", "/")).ToList();
-            RelativeRoots = roots.Where(r => r != ".").Select(r => {
+            ClearcaseRoot = clearcaseRoot.Replace("\\", "/");
+            _roots = new List<string>(roots).Select(r => r.Replace("\\", "/")).ToList();
+            _relativeRoots = roots.Where(r => r != ".").Select(r => {
                 if (r.StartsWith(clearcaseRoot)) {
                     r = r.Substring(clearcaseRoot.Length);
                 }
@@ -136,7 +142,7 @@ namespace GitImporter
             {
                 _writer.Write("commit refs/heads/" + branchName + "\n");
                 _writer.Write("mark :" + changeSet.Id + "\n");
-                _writer.Write("committer " + changeSet.AuthorName + " <" + changeSet.AuthorLogin + "> " + (changeSet.StartTime - _epoch).TotalSeconds + " +0200\n");
+                _writer.Write("committer " + changeSet.AuthorName + " <" + changeSet.AuthorLogin + "> " + (changeSet.StartTime - Epoch).TotalSeconds + " +0200\n");
                 _writer.Write("# " + changeSet.StartTime + "\n");
                 InlineString(changeSet.GetComment());
                 if (changeSet.BranchingPoint != null)
@@ -216,7 +222,7 @@ namespace GitImporter
                 _writer.Write("tagger " + meta.AuthorName + " <" + meta.AuthorLogin + "> " + (meta.Created - epoch).TotalSeconds + " +0000\n"); // var +0200
 
                 List<Tuple<ElementVersion, ElementVersion>> possibleBroken = labels[label].PossiblyBroken.Where(
-                    t => null != RelativeRoots.Find(
+                    t => null != _relativeRoots.Find(
                         r => RemoveDotRoot(t.Item1.ToString().Replace("\\", "/") + "/").StartsWith(r + "/")
                     )).ToList();
                 if (possibleBroken.Count > 0)
@@ -254,10 +260,29 @@ namespace GitImporter
 
         private string RemoveDotRoot(string path)
         {
-            foreach (string root in Roots) {
-                if (path.StartsWith(root)) {
-                    path = path.Substring(root.Length);
-                    break;
+            if (_trimRoots)
+            {
+                foreach (string root in _roots)
+                {
+                    if (path.StartsWith(root))
+                    {
+                        path = path.Substring(root.Length);
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                if (path.StartsWith(ClearcaseRoot))
+                {
+                    path = path.Substring(ClearcaseRoot.Length);
+                }
+            }
+            foreach (var prefix in _prefixes)
+            {
+                if (path.StartsWith(prefix))
+                {
+                    path = path.Substring(prefix.Length);
                 }
             }
             if (path.StartsWith("/")) {

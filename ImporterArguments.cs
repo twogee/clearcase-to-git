@@ -17,8 +17,12 @@ namespace GitImporter
         public string ElementsFile;
         [Argument(ArgumentType.AtMostOnce, HelpText = "File listing individual versions to import.")]
         public string VersionsFile;
+        [Argument(ArgumentType.AtMostOnce, HelpText = "Indicates that parents of roots will be removed from the element paths in git history, always true when a single root is specified.")]
+        public bool TrimRoots;
         [Argument(ArgumentType.MultipleUnique, HelpText = "Roots : directory elements whose parents are not imported.", DefaultValue = new string[0])]
         public string[] Roots;
+        [Argument(ArgumentType.MultipleUnique, HelpText = "Prefix(es) to remove from paths when building output files", DefaultValue = new[] { "." })]
+        public string[] Prefixes;
         [Argument(ArgumentType.MultipleUnique, HelpText = "Branches to import (may be a regular expression).", DefaultValue = new[] { ".*" })]
         public string[] Branches;
         [Argument(ArgumentType.MultipleUnique, HelpText = "Labels to import (may be a regular expression, or NONE).", DefaultValue = new[] { ".*" })]
@@ -80,6 +84,9 @@ namespace GitImporter
                 Console.Error.WriteLine("Roots must be specified");
                 return false;
             }
+
+            if (!TrimRoots && Roots.Length == 1)
+                TrimRoots = true;
 
             return true;
         }

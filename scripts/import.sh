@@ -16,6 +16,7 @@ vobTag=
 refDate=
 vobDirs=
 mergeDirs=
+prefixes=
 labels=
 branches=
 excludes=
@@ -31,6 +32,9 @@ if [ -z "$viewTag" ] || [ -z "$vobTag" ]; then
     echo "View and VOB tags must be configured!"
     exit 1
 fi
+
+cleartool startview "$viewTag"
+[ "$(cleartool lsvob \\"$vobTag" | wc -w)" -eq 3 ] && cleartool mount \\"$vobTag"
 
 mvfsKey="HKLM\\SYSTEM\\CurrentControlSet\\services\\Mvfs\\Parameters"
 viewDrive="$(reg query $mvfsKey //v drive | perl -ane 'if (/drive/) { print uc pop @F }')"
@@ -60,6 +64,13 @@ done
 set -o nounset
 
 # prep the setup
+prefixList=()
+if [ -n "$prefixes" ]; then
+    for prefix in $prefixes; do
+        prefixList+=("-Prefixes:$prefix")
+    done
+fi
+
 labelList=()
 if [ -n "$labels" ]; then
     for label in $labels; do
@@ -200,14 +211,14 @@ if [ -z "${mergeDirs}" ]; then
                 rm "history-$root.bin.bak"
             fi
 
-            GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$root.bin" -C:"$viewDirWin" -N -R:"$viewDirWin\\$root" > "to_import_full_$root"
+            GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$root.bin" -C:"$viewDirWin" -N "${prefixList[@]}" -R:"$viewDirWin\\$root" > "to_import_full_$root"
             mv "$scriptDir/GitImporter.log" "create_changesets-$root.log"
 
             export GIT_DIR="$workingDir/git-import/git-repo/$root"
             git init "$GIT_DIR"
             git config core.ignorecase false
 
-            GitImporter.exe -C:"$viewDirWin" -F:"to_import_full_$root" -R:"$viewDirWin\\$root" | tee /dev/null | git fast-import --export-marks="git-marks-$root.marks"
+            GitImporter.exe -C:"$viewDirWin" -F:"to_import_full_$root" "${prefixList[@]}" -R:"$viewDirWin\\$root" | tee /dev/null | git fast-import --export-marks="git-marks-$root.marks"
             mv "$scriptDir/GitImporter.log" "create_repo-$root.log"
 
             echo "Repacking repo..."
@@ -233,14 +244,14 @@ else
             rm "history-$vobTag.bin.bak"
         fi
 
-        GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$vobTag.bin" -C:"$viewDirWin" -N "${rootList[@]}" > "to_import_full_$vobTag"
+        GitImporter.exe -L:export/fullVobDB.bin "${labelList[@]}" "${branchList[@]}" -I:gitignore -H:"history-$vobTag.bin" -C:"$viewDirWin" -N "${prefixList[@]}" "${rootList[@]}" > "to_import_full_$vobTag"
         mv "$scriptDir/GitImporter.log" "create_changesets-$vobTag.log"
 
         export GIT_DIR="$workingDir/git-import/git-repo/$vobTag"
         git init "$GIT_DIR"
         git config core.ignorecase false
 
-        GitImporter.exe -C:"$viewDirWin" -F:"to_import_full_$vobTag" "${rootList[@]}" | tee /dev/null | git fast-import --export-marks="git-marks-$vobTag.marks"
+        GitImporter.exe -C:"$viewDirWin" -F:"to_import_full_$vobTag" "${prefixList[@]}" "${rootList[@]}" | tee /dev/null | git fast-import --export-marks="git-marks-$vobTag.marks"
         mv "$scriptDir/GitImporter.log" "create_repo-$vobTag.log"
 
         echo "Repacking repo..."
