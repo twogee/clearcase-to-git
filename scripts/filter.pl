@@ -11,7 +11,9 @@ BEGIN {
         # we need to know all interesting elements, even if they exist only in checkedout directories, but we skip checkedout *versions* (incremental export)
 	qr/CHECKEDOUT\r$/,
 	# general directories
-	qr/\\directory_not_wanted/,
+	qr/\\directory_not_wanted/, 
+	qr/\.unloaded/,
+	qr/ - Copy/,
 	qr/lost\+found/,
 
 	# files
@@ -19,6 +21,8 @@ BEGIN {
 	qr/\.mkelem$file_ending/,
 	qr/\.\w+\.user$file_ending/,
 	qr/\.suo$file_ending/,
+	qr/\.checkedout$file_ending/,
+	qr/\.hijacked$file_ending/,
 	qr/\.contrib$file_ending/,
 	qr/\.keep$file_ending/);
 }
