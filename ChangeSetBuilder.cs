@@ -238,7 +238,6 @@ namespace GitImporter
                 }
                 // if this element is also added, we handle it (later) as a rename,
                 // but if it was present in several paths that are removed, we only keep the first (visible) one
-                bool isRenamed = addedElements.Any(p => p.Key == pair.Key);
                 foreach (var namedInElement in pair.Value.ToList())
                 {
                     HashSet<string> parentElementNames;
