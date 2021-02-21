@@ -129,12 +129,7 @@ namespace GitImporter
             Labels = new List<string>();
         }
 
-        public NamedVersion Add(ElementVersion version)
-        {
-            return Add(version, null, true);
-        }
-
-        public NamedVersion Add(ElementVersion version, string name, bool inRawChangeSet)
+        public NamedVersion Add(ElementVersion version, string name = null, bool inRawChangeSet = true)
         {
             NamedVersion result;
             NamedVersion existing = Versions.Find(v => v.Version.Element == version.Element);
