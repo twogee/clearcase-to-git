@@ -13,10 +13,10 @@ namespace GitImporter
     {
         public static TraceSource Logger = Program.Logger;
 
-        private static readonly Regex _isFullVersionRegex = new Regex(@"\\\d+$");
-        private static readonly Regex _versionRegex = new Regex(@"(.*)\@\@(\\main(\\[\w\.\-]+)*\\\d+)$");
+        private static readonly Regex IsFullVersionRegex = new Regex(@"\\\d+$");
+        private static readonly Regex VersionRegex = new Regex(@"(.*)\@\@(\\main(\\[\w\.\-]+)*\\\d+)$");
 
-        private const int _nbCleartool = 10;
+        private const int NbCleartool = 10;
         private readonly Cleartool[] _cleartools;
         private readonly DateTime _apexDate;
         private readonly DateTime _originDate;
@@ -32,8 +32,8 @@ namespace GitImporter
         public CleartoolReader(string clearcaseRoot, string apexDate, string originDate, IEnumerable<string> labels)
         {
             var labelFilter = new LabelFilter(labels);
-            _cleartools = new Cleartool[_nbCleartool];
-            for (int i = 0; i < _nbCleartool; i++)
+            _cleartools = new Cleartool[NbCleartool];
+            for (int i = 0; i < NbCleartool; i++)
                 _cleartools[i] = new Cleartool(clearcaseRoot, labelFilter);
 
             _apexDate = string.IsNullOrEmpty(apexDate) ? new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc) : DateTime.Parse(apexDate).ToUniversalTime();
@@ -58,8 +58,8 @@ namespace GitImporter
                         if (iTask % 500 == 0)
                             Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Fetching oid for element " + iTask);
                         string oid;
-                        lock (_cleartools[iTask % _nbCleartool])
-                            oid = _cleartools[iTask % _nbCleartool].GetOid(currentElement.Name);
+                        lock (_cleartools[iTask % NbCleartool])
+                            oid = _cleartools[iTask % NbCleartool].GetOid(currentElement.Name);
                         if (string.IsNullOrEmpty(oid))
                         {
                             Logger.TraceData(TraceEventType.Warning, (int)TraceId.ReadCleartool, "Could not find oid for element " + currentElement.Name);
@@ -73,7 +73,7 @@ namespace GitImporter
                             _oidsToCheck.Add(oid);
                     });
             }
-            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _nbCleartool * 2 }, allActions.ToArray());
+            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = NbCleartool * 2 }, allActions.ToArray());
             Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.ReadCleartool, "Stop fetching oids of exported elements");
         }
 
@@ -96,11 +96,11 @@ namespace GitImporter
                             {
                                 if (iTask % 100 == 0)
                                     Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Reading file element " + iTask);
-                                ReadElement(currentLine, false, _cleartools[iTask % _nbCleartool]);
+                                ReadElement(currentLine, false, _cleartools[iTask % NbCleartool]);
                             });
                     }
                 }
-                Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _nbCleartool * 2 }, allActions.ToArray());
+                Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = NbCleartool * 2 }, allActions.ToArray());
                 Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.ReadCleartool, "Stop reading file elements", elementsFile);
             }
 
@@ -120,11 +120,11 @@ namespace GitImporter
                             {
                                 if (iTask % 20 == 0)
                                     Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Reading directory element " + iTask);
-                                ReadElement(currentLine, true, _cleartools[iTask % _nbCleartool]);
+                                ReadElement(currentLine, true, _cleartools[iTask % NbCleartool]);
                             });
                     }
                 }
-                Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _nbCleartool * 2 }, allActions.ToArray());
+                Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = NbCleartool * 2 }, allActions.ToArray());
                 Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.ReadCleartool, "Stop reading directory elements", directoriesFile);
             }
 
@@ -141,7 +141,7 @@ namespace GitImporter
                     {
                         if (++i % 100 == 0)
                             Logger.TraceData(TraceEventType.Information, (int)TraceId.ReadCleartool, "Reading version " + i);
-                        ReadVersion(line, result, _cleartools[i % _nbCleartool]);
+                        ReadVersion(line, result, _cleartools[i % NbCleartool]);
                     }
                 }
                 Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.ReadCleartool, "Stop reading individual versions", versionsFile);
@@ -205,7 +205,7 @@ namespace GitImporter
                     string login;
                     DateTime date;
 
-                    var cleartool = _cleartools[task % _nbCleartool]; 
+                    var cleartool = _cleartools[task % NbCleartool]; 
                     lock (cleartool)
                         cleartool.GetLabelDetails(label, out author, out login, out date);
 
@@ -219,7 +219,7 @@ namespace GitImporter
                         _labelMetas[label] = labelMeta;
                 });
             }
-            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = _nbCleartool * 2 }, labelActions.ToArray());
+            Parallel.Invoke(new ParallelOptions { MaxDegreeOfParallelism = NbCleartool * 2 }, labelActions.ToArray());
             Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.ReadCleartool, "Stop reading label meta info");
 
             return result;
@@ -261,7 +261,7 @@ namespace GitImporter
             foreach (string versionString in versionStrings)
             {
                 // there is a first "version" for each branch, without a version number
-                if (!_isFullVersionRegex.IsMatch(versionString))
+                if (!IsFullVersionRegex.IsMatch(versionString))
                     continue;
                 Logger.TraceData(TraceEventType.Verbose, (int)TraceId.ReadCleartool, "Creating version", versionString);
                 string[] versionPath = versionString.Split(new[] { '\\' }, StringSplitOptions.RemoveEmptyEntries);
@@ -333,7 +333,7 @@ namespace GitImporter
                         Element childElement;
                         if (ElementsByOid.TryGetValue(child.Value, out childElement))
                             dirVersion.Content.Add(new KeyValuePair<string, Element>(child.Key, childElement));
-                        else if (child.Value.StartsWith(SymLinkElement.SYMLINK))
+                        else if (child.Value.StartsWith(SymLinkElement.Symlink))
                         {
                             Element symLink = new SymLinkElement(branch.Element, child.Value);
                             Element existing;
@@ -384,7 +384,7 @@ namespace GitImporter
 
         private void ReadVersion(string version, List<ElementVersion> newVersions, Cleartool cleartool)
         {
-            Match match = _versionRegex.Match(version);
+            Match match = VersionRegex.Match(version);
             if (!match.Success)
             {
                 Logger.TraceData(TraceEventType.Warning, (int)TraceId.ReadCleartool, "Could not parse '" + version + "' as a ClearCase version");

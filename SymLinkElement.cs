@@ -8,7 +8,7 @@ namespace GitImporter
     [ProtoContract]
     public class SymLinkElement : Element
     {
-        public const string SYMLINK = "symlink:";
+        public const string Symlink = "symlink:";
 
         public Element Directory { get; private set; }
         [ProtoMember(1, AsReference = true)] private string _directoryOid;
@@ -17,11 +17,11 @@ namespace GitImporter
         public string Target { get; private set; }
 
         public SymLinkElement(Element directory, string name)
-            : base(directory + "\\" + name.Substring(SYMLINK.Length), false)
+            : base(directory + "\\" + name.Substring(Symlink.Length), false)
         {
-            Oid = SYMLINK + Name;
+            Oid = Symlink + Name;
             Directory = directory;
-            Target = name.Substring(SYMLINK.Length);
+            Target = name.Substring(Symlink.Length);
         }
 
         // for Protobuf deserialization

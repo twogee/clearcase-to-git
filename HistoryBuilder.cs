@@ -59,7 +59,7 @@ namespace GitImporter
         private Dictionary<string, int> _rawBranchTips;
         [ProtoMember(9)]
         private string _clearcaseRoot;
-        private List<String> RelativeRoots;
+        private List<String> _relativeRoots;
         private Dictionary<string, LabelInfo> _allLabels;
         private Dictionary<string, LabelMeta> _labelMetas;
 
@@ -97,7 +97,7 @@ namespace GitImporter
                 _roots.Add(root);
             _clearcaseRoot = clearcaseRoot;
 
-            RelativeRoots = roots.Where(r => r != ".").Select(r => {
+            _relativeRoots = roots.Where(r => r != ".").Select(r => {
                 if (r.StartsWith(clearcaseRoot)) {
                     r = r.Substring(clearcaseRoot.Length);
                 }
@@ -111,10 +111,10 @@ namespace GitImporter
 
         private string RemoveDotRoot(string path)
         {
-            string ClearcaseRoot = _clearcaseRoot.Replace("\\", "/");
-            if (path.StartsWith(ClearcaseRoot))
+            string clearcaseRoot = _clearcaseRoot.Replace("\\", "/");
+            if (path.StartsWith(clearcaseRoot))
             {
-                path = path.Substring(ClearcaseRoot.Length);
+                path = path.Substring(clearcaseRoot.Length);
             }
             if (path.StartsWith("/")) {
                 path = path.Substring(1);
@@ -122,15 +122,15 @@ namespace GitImporter
             return path.StartsWith("./") ? path.Substring(2) : path;
         }
 
-        private bool insideRoot(Element element)
+        private bool InsideRoot(Element element)
         {
-            string ClearcaseRoot = _clearcaseRoot.Replace("\\", "/");
+            string clearcaseRoot = _clearcaseRoot.Replace("\\", "/");
             var name = element.Name.Replace("\\", "/");
             string normalizedName;
-            if (name.StartsWith(ClearcaseRoot + "/.@@/main/"))
+            if (name.StartsWith(clearcaseRoot + "/.@@/main/"))
             {
                 // hidden. take special care
-                name = name.Substring((ClearcaseRoot + "/.@@/main/").Length);
+                name = name.Substring((clearcaseRoot + "/.@@/main/").Length);
                 var match = Regex.Match(name, "([0-9]+?)/([^0-9/]+)");
                 if (!match.Success)
                 {
@@ -143,7 +143,7 @@ namespace GitImporter
                 // visible. nothing special here
                 normalizedName = RemoveDotRoot(name);
             }
-            return null != RelativeRoots.Find(
+            return null != _relativeRoots.Find(
                 r =>  {
                     Logger.TraceData(TraceEventType.Verbose, (int)TraceId.CreateChangeSet, "Comparing in history", normalizedName, "vs", r);
                     return normalizedName == "." || normalizedName == r || normalizedName.StartsWith(r + "/") || normalizedName.StartsWith(r + "@@/");
@@ -155,7 +155,7 @@ namespace GitImporter
         {
             _rawHistoryBuilder.SetClearcaseRoot(_clearcaseRoot);
             _rawHistoryBuilder.SetRoots(_roots);
-            _rawHistoryBuilder.SetRelativeRoots(RelativeRoots);
+            _rawHistoryBuilder.SetRelativeRoots(_relativeRoots);
             _flattenChangeSets = _rawHistoryBuilder.Build(newVersions);
             if (_globalBranches != null)
             {
@@ -418,7 +418,7 @@ namespace GitImporter
                     var lostVersion = orphanedVersion.Item2.Version;
                     lostVersions.Add(lostVersion);
                     labeledOrphans.Remove(lostVersion);
-                    if (insideRoot(lostVersion.Element))
+                    if (InsideRoot(lostVersion.Element))
                     {
                         Logger.TraceData(TraceEventType.Warning, (int)TraceId.CreateChangeSet,
                                      "Version " + lostVersion + " has not been visible in any imported directory version");

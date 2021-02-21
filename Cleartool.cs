@@ -160,7 +160,7 @@ namespace GitImporter
                 else if ((match = _oidRegex.Match(line)).Success)
                     oid = match.Groups[1].Value;
                 else if ((match = _symlinkRegex.Match(line)).Success)
-                    oid = SymLinkElement.SYMLINK + match.Groups[1].Value;
+                    oid = SymLinkElement.Symlink + match.Groups[1].Value;
             }
             if (name != null && oid != null)
                 result[name] = oid;

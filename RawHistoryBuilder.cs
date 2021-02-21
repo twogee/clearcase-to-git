@@ -10,8 +10,8 @@ namespace GitImporter
     {
         public static TraceSource Logger = Program.Logger;
 
-        private const int MAX_DELAY = 60 * 30;
-        private static readonly ChangeSet.TimeComparer _timeComparer = new ChangeSet.TimeComparer();
+        private const int MaxDelay = 60 * 30;
+        private static readonly ChangeSet.TimeComparer TimeComparer = new ChangeSet.TimeComparer();
 
         private readonly Dictionary<string, Element> _elementsByOid;
         private List<Regex> _branchFilters;
@@ -69,7 +69,7 @@ namespace GitImporter
             FilterLabels();
             List<ChangeSet> changes = _changeSets.Values.SelectMany(d => d.Values.SelectMany(l => l)).ToList();
             Logger.TraceData(TraceEventType.Start | TraceEventType.Information, (int)TraceId.CreateChangeSet, "Start sorting raw ChangeSets of size", changes.Count);
-            changes.Sort(_timeComparer);
+            changes.Sort(TimeComparer);
             Logger.TraceData(TraceEventType.Stop | TraceEventType.Information, (int)TraceId.CreateChangeSet, "Stop sorting raw ChangeSets");
             return changes;
         }
@@ -100,7 +100,7 @@ namespace GitImporter
                 var allNewVersions = new HashSet<ElementVersion>(newVersions);
                 foreach (var version in newVersions)
                 {
-                    if (!insideRoot(version.Element)) 
+                    if (!InsideRoot(version.Element))
                     {
                         Logger.TraceData(TraceEventType.Verbose, (int)TraceId.CreateChangeSet, "Skipping version not inside root", version);
                         continue;
@@ -119,7 +119,7 @@ namespace GitImporter
             {
                 foreach (var element in _elementsByOid.Values)
                 {
-                    if (!insideRoot(element)) 
+                    if (!InsideRoot(element))
                     {
                         Logger.TraceData(TraceEventType.Verbose, (int)TraceId.CreateChangeSet, "Skipping element not inside root", element);
                         continue;
@@ -143,7 +143,7 @@ namespace GitImporter
             return allElementBranches;
         }
 
-        private bool insideRoot(Element element)
+        private bool InsideRoot(Element element)
         {
             var name = element.Name.Replace("\\", "/");
             string normalizedName;
@@ -219,7 +219,7 @@ namespace GitImporter
                 return;
             }
 
-            int index = changeSets.BinarySearch(changeSet, _timeComparer);
+            int index = changeSets.BinarySearch(changeSet, TimeComparer);
             if (index >= 0)
             {
                 changeSets[index].Add(version);
@@ -231,7 +231,7 @@ namespace GitImporter
             {
                 // so even the last one is not bigger
                 ChangeSet candidate = changeSets[index - 1];
-                if (version.Date <= candidate.FinishTime.AddSeconds(MAX_DELAY))
+                if (version.Date <= candidate.FinishTime.AddSeconds(MaxDelay))
                     candidate.Add(version);
                 else
                 {
@@ -243,7 +243,7 @@ namespace GitImporter
             if (index == 0)
             {
                 ChangeSet candidate = changeSets[0];
-                if (version.Date >= candidate.StartTime.AddSeconds(-MAX_DELAY))
+                if (version.Date >= candidate.StartTime.AddSeconds(-MaxDelay))
                     candidate.Add(version);
                 else
                 {
@@ -254,17 +254,17 @@ namespace GitImporter
             }
             DateTime lowerBound = changeSets[index - 1].FinishTime;
             DateTime upperBound = changeSets[index].StartTime;
-            if (version.Date <= lowerBound.AddSeconds(MAX_DELAY) && version.Date < upperBound.AddSeconds(-MAX_DELAY))
+            if (version.Date <= lowerBound.AddSeconds(MaxDelay) && version.Date < upperBound.AddSeconds(-MaxDelay))
             {
                 changeSets[index - 1].Add(version);
                 return;
             }
-            if (version.Date > lowerBound.AddSeconds(MAX_DELAY) && version.Date >= upperBound.AddSeconds(-MAX_DELAY))
+            if (version.Date > lowerBound.AddSeconds(MaxDelay) && version.Date >= upperBound.AddSeconds(-MaxDelay))
             {
                 changeSets[index].Add(version);
                 return;
             }
-            if (version.Date > lowerBound.AddSeconds(MAX_DELAY) && version.Date < upperBound.AddSeconds(-MAX_DELAY))
+            if (version.Date > lowerBound.AddSeconds(MaxDelay) && version.Date < upperBound.AddSeconds(-MaxDelay))
             {
                 changeSet.Add(version);
                 changeSets.Insert(index, changeSet);
@@ -382,7 +382,7 @@ namespace GitImporter
 
         private void FilterBranches()
         {
-            var relativeRoots = computeRelativeRoots();
+            var relativeRoots = ComputeRelativeRoots();
             var branchesToRemove = new HashSet<string>();
 
             if (_branchFilters != null && _branchFilters.Count != 0)
@@ -418,7 +418,7 @@ namespace GitImporter
                 Labels.Remove(toRemove);
             }
 
-            var relativeRoots = computeRelativeRoots();
+            var relativeRoots = ComputeRelativeRoots();
             labelsToRemove = Labels.Values
                 .Where(l => {
                     // only filter this label if all the versions are not in a root
@@ -453,7 +453,7 @@ namespace GitImporter
                 label.Reset();
         }
 
-        private List<string> computeRelativeRoots()
+        private List<string> ComputeRelativeRoots()
         {
             return Roots.Where(r => r != ".").Select(r => {
                 if (r.StartsWith(ClearcaseRoot)) {
