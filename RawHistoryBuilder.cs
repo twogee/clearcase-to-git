@@ -93,7 +93,7 @@ namespace GitImporter
             Logger.TraceData(TraceEventType.Start | TraceEventType.Information, (int)TraceId.CreateChangeSet, "Start creating raw ChangeSets");
             // the list must always be kept sorted, so that BinarySearch works
             // if the size of the list gets too big and (mostly) linear insertion time becomes a problem,
-            // we could look at SorteList<> (which is not actually a list, but a dictionary)
+            // we could look at SortedList<> (which is not actually a list, but a dictionary)
             _changeSets = new Dictionary<string, Dictionary<string, List<ChangeSet>>>();
             // keep all FullName's, so that we can try to guess "global" BranchingPoint
             var allElementBranches = new HashSet<string>();

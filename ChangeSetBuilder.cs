@@ -356,7 +356,7 @@ namespace GitImporter
                                         else
                                         {
                                             // then simply do this rename before
-                                            // somebedy was perverse enough to exchange the names !
+                                            // somebody was perverse enough to exchange the names !
                                             var tmpName = oldName + "." + Guid.NewGuid();
                                             _changeSet.Renamed[conflictingRename] = new Tuple<string, string>(renamedTo, tmpName);
                                             _changeSet.Renamed.Add(new Tuple<string, string>(oldName, renamedTo));

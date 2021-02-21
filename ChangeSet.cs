@@ -60,7 +60,7 @@ namespace GitImporter
 
         public List<NamedVersion> Versions { get; private set; }
         /// <summary>
-        /// SkippedVersions are usefull only for mergesTo : if there is a merge to a skipped version,
+        /// SkippedVersions are useful only for mergesTo : if there is a merge to a skipped version,
         /// the actual (more recent) version of the corresponding element is also merged
         /// </summary>
         public List<ElementVersion> SkippedVersions { get; private set; }
