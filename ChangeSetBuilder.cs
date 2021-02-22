@@ -238,7 +238,6 @@ namespace GitImporter
                 }
                 // if this element is also added, we handle it (later) as a rename,
                 // but if it was present in several paths that are removed, we only keep the first (visible) one
-                bool isRenamed = addedElements.Any(p => p.Key == pair.Key);
                 foreach (var namedInElement in pair.Value.ToList())
                 {
                     HashSet<string> parentElementNames;
@@ -356,7 +355,7 @@ namespace GitImporter
                                         else
                                         {
                                             // then simply do this rename before
-                                            // somebedy was perverse enough to exchange the names !
+                                            // somebody was perverse enough to exchange the names !
                                             var tmpName = oldName + "." + Guid.NewGuid();
                                             _changeSet.Renamed[conflictingRename] = new Tuple<string, string>(renamedTo, tmpName);
                                             _changeSet.Renamed.Add(new Tuple<string, string>(oldName, renamedTo));

@@ -299,7 +299,7 @@ namespace GitImporter
             if (!fileInfo.Exists)
             {
                 // in incremental import, elements may have been moved, without a new version, we try to use the oid
-                // (we don't always do that to avoid unecessary calls to cleartool)
+                // (we don't always do that to avoid unnecessary calls to cleartool)
                 string newElementName = _cleartool.GetElement(elementOid);
                 if (!string.IsNullOrEmpty(newElementName))
                 {
@@ -323,7 +323,7 @@ namespace GitImporter
                 }
                 return;
             }
-            // clearcase always create as ReadOnly
+            // clearcase always creates as ReadOnly
             fileInfo.IsReadOnly = false;
             foreach (string name in names)
             {
@@ -348,7 +348,7 @@ namespace GitImporter
 
         public void WriteFile(string fileName)
         {
-            // we can't simply ReadLine() because of end of line discrepencies within comments
+            // we can't simply ReadLine() because of end of line discrepancies within comments
             int c;
             int lineNb = 0;
             var currentLine = new List<char>(1024);

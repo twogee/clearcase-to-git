@@ -120,15 +120,15 @@
 //        /files:<string>                     short form /f
 //        @<file>                             Read response file for more options
 //
-//    That was pretty easy. However, you realy want to omit the "/files:" for the 
-//    list of files. The details of field parsing can be controled using custom 
+//    That was pretty easy. However, you really want to omit the "/files:" for the 
+//    list of files. The details of field parsing can be controlled using custom 
 //    attributes. The attributes which control parsing behaviour are:
 //
 //    ArgumentAttribute 
 //        - controls short name, long name, required, allow duplicates, default value
 //        and help text
 //    DefaultArgumentAttribute 
-//        - allows omition of the "/name".
+//        - allows omission of the "/name".
 //        - This attribute is allowed on only one field in the argument class.
 //
 //    So for the wc.exe program we want this:
@@ -231,7 +231,7 @@ namespace CommandLine
         /// </summary>
         Unique      = 0x02,
         /// <summary>
-        /// Inidicates that the argument may be specified more than once.
+        /// Indicates that the argument may be specified more than once.
         /// Only valid if the argument is a collection
         /// </summary>
         Multiple    = 0x04,
