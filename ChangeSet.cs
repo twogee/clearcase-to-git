@@ -113,7 +113,7 @@ namespace GitImporter
         {
             get
             {
-                return Versions.Where(v => !v.Version.Element.IsDirectory).Where(v => !v.Version.VersionPath.Equals("\\main\\0")).Count();
+                return Versions.Where(v => !v.Version.Element.IsDirectory).Count(v => !v.Version.VersionPath.Equals("\\main\\0"));
             }
         }
 
@@ -205,7 +205,6 @@ namespace GitImporter
 
             string treeMessage;
             string filesMessage = DisplayFileNames(interestingFileChanges.Select(v => v.Names[0]).ToList(), false);
-            string description = null;
 
             if (nbTreeChanges > 0)
                 treeMessage = string.Format("{0} file modification{1} and {2} tree modification{3}",
@@ -274,11 +273,8 @@ namespace GitImporter
                 }
 
             }
-            description = sb.ToString();
-            if( sb.Length > 0 ){
-                return message + description;
-            }
-            return message;
+
+            return sb.Length > 0 ? message + sb : message;
         }
 
         private static string DisplayFileNames(IList<string> fileNames, bool showNbNonDisplayed)

@@ -209,7 +209,7 @@ namespace GitImporter
 
             foreach(var pair in addedElements)
             {
-                if (!removedElements.Any(p => p.Key.Oid == pair.Key.Oid))
+                if (removedElements.All(p => p.Key.Oid != pair.Key.Oid))
                 {
                     continue;
                 }
@@ -219,7 +219,7 @@ namespace GitImporter
                 {
                     Tuple<Element, string> a = added[i];
                     Tuple<Element, string> matching = removed.Find(r => r.Item1.Oid == a.Item1.Oid && r.Item2 == a.Item2);
-                    if (matching != null && previousVersion != null && !previousVersion.Content.Any(p => p.Value == matching.Item1))
+                    if (matching != null && previousVersion != null && previousVersion.Content.All(p => p.Value != matching.Item1))
                     {
                         Logger.TraceData(TraceEventType.Warning, (int)TraceId.CreateChangeSet,
                             "Erasing added and at the same time removed version", matching.Item1, matching.Item2);

@@ -1102,7 +1102,7 @@ namespace CommandLine
                 this.field = field;
                 this.seenValue = false;
                 this.reporter = reporter;
-                this.isDefault = attribute != null && attribute is DefaultArgumentAttribute;
+                this.isDefault = attribute is DefaultArgumentAttribute;
                 
                 if (IsCollection)
                 {
