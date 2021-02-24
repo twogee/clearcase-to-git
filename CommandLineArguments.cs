@@ -630,14 +630,14 @@ namespace CommandLine
                 this.argumentMap[argument.LongName] = argument;
                 if (argument.ExplicitShortName)
                 {
-                    if (argument.ShortName != null && argument.ShortName.Length > 0)
+                    if (string.IsNullOrEmpty(argument.ShortName))
                     {
-                        Debug.Assert(!argumentMap.ContainsKey(argument.ShortName));
-                        this.argumentMap[argument.ShortName] = argument;
+                        argument.ClearShortName();
                     }
                     else
                     {
-                        argument.ClearShortName();
+                        Debug.Assert(!argumentMap.ContainsKey(argument.ShortName));
+                        this.argumentMap[argument.ShortName] = argument;
                     }
                 }
             }
@@ -647,10 +647,10 @@ namespace CommandLine
             {
                 if (!argument.ExplicitShortName)
                 {
-                    if (argument.ShortName != null && argument.ShortName.Length > 0 && !argumentMap.ContainsKey(argument.ShortName))
-                        this.argumentMap[argument.ShortName] = argument;
-                    else
+                    if (string.IsNullOrEmpty(argument.ShortName) || argumentMap.ContainsKey(argument.ShortName))
                         argument.ClearShortName();
+                    else
+                        this.argumentMap[argument.ShortName] = argument;
                 }
             }
         }
@@ -1109,7 +1109,7 @@ namespace CommandLine
                     this.collectionValues = new ArrayList();
                 }
                 
-                Debug.Assert(this.longName != null && this.longName != "");
+                Debug.Assert(!string.IsNullOrEmpty(this.longName));
                 Debug.Assert(!this.isDefault || !this.ExplicitShortName);
                 Debug.Assert(!IsCollection || AllowMultiple, "Collection arguments must have allow multiple");
                 Debug.Assert(!Unique || IsCollection, "Unique only applicable to collection arguments");
