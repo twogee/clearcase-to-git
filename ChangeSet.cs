@@ -163,7 +163,8 @@ namespace GitImporter
                     SkippedVersions.Add(skippedVersion);
                 result = existing;
             }
-            else {
+            else
+            {
                 Versions.Add(result = new NamedVersion(version, name, inRawChangeSet));
             }
             if (inRawChangeSet)
@@ -238,13 +239,20 @@ namespace GitImporter
             // treeMessage and fileMessage will be set, activityMessage, and commentMessage might be set.
             //we know enough now to generate our top line.
 
-            if( activityMessage != null && commentMessage != null  ){
+            if (activityMessage != null && commentMessage != null)
+            {
                 message = commentMessage + " { " + activityMessage + " } " + " ( " + treeMessage + " ) : " + filesMessage;
-            }else if( activityMessage != null   ){
+            }
+            else if (activityMessage != null)
+            {
                 message = activityMessage + " ( " + treeMessage + " ) : " + filesMessage;
-            }else if( commentMessage != null  ){
+            }
+            else if (commentMessage != null)
+            {
                 message = commentMessage + " ( " + treeMessage + " ) : " + filesMessage;
-            }else{
+            }
+            else
+            {
                 message = treeMessage + " : " + filesMessage;
             }
 
