@@ -103,7 +103,7 @@
 //        }
 //    }
 //
-//    So you could call this aplication with the following command line to count 
+//    So you could call this application with the following command line to count 
 //    lines in the foo and bar files:
 //
 //        wc.exe /lines /files:foo /files:bar
@@ -247,7 +247,7 @@ namespace CommandLine
         /// once no error is reported and the value of the argument is the last
         /// value which occurs in the argument list.
         /// </summary>
-        LastOccurenceWins = Multiple,
+        LastOccurrenceWins = Multiple,
 
         /// <summary>
         /// The default type for collection arguments.
@@ -379,7 +379,7 @@ namespace CommandLine
     /// <summary>
     /// Parser for command line arguments.
     ///
-    /// The parser specification is infered from the instance fields of the object
+    /// The parser specification is inferred from the instance fields of the object
     /// specified as the destination of the parse.
     /// Valid argument types are: int, uint, string, bool, enums
     /// Also argument types of Array of the above types are also valid.
@@ -414,7 +414,7 @@ namespace CommandLine
         
         /// <summary>
         /// Parses Command Line Arguments. Displays usage message to Console.Out
-        /// if /?, /help or invalid arguments are encounterd.
+        /// if /?, /help or invalid arguments are encountered.
         /// Errors are output on Console.Error.
         /// Use ArgumentAttributes to control parsing behaviour.
         /// </summary>
@@ -563,7 +563,7 @@ namespace CommandLine
         /// <param name="text"> The text to search. </param>
         /// <param name="value"> The character value to search for. </param>
         /// <param name="startIndex"> The index to stat searching at. </param>
-        /// <returns> The index of the first occurence of value or -1 if it is not found. </returns>
+        /// <returns> The index of the first occurrence of value or -1 if it is not found. </returns>
         public static int IndexOf(StringBuilder text, char value, int startIndex)
         {
             for (int index = startIndex; index < text.Length; index++)
@@ -581,7 +581,7 @@ namespace CommandLine
         /// <param name="text"> The text to search. </param>
         /// <param name="value"> The character to search for. </param>
         /// <param name="startIndex"> The index to start the search at. </param>
-        /// <returns>The index of the last occurence of value in text or -1 if it is not found. </returns>
+        /// <returns>The index of the last occurrence of value in text or -1 if it is not found. </returns>
         public static int LastIndexOf(StringBuilder text, char value, int startIndex)
         {
             for (int index = Math.Min(startIndex, text.Length - 1); index >= 0; index --)
@@ -776,7 +776,7 @@ namespace CommandLine
         }
         
         /// <summary>
-        /// A user firendly usage string describing the command line argument syntax.
+        /// A user friendly usage string describing the command line argument syntax.
         /// </summary>
         public string GetUsageString(int screenWidth)
         {

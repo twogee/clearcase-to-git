@@ -237,7 +237,7 @@ namespace GitImporter
             }
 
             // treeMessage and fileMessage will be set, activityMessage, and commentMessage might be set.
-            //we know enough now to generat our top line.
+            //we know enough now to generate our top line.
 
             if( activityMessage != null && commentMessage != null  ){
                 message = commentMessage + " { " + activityMessage + " } " + " ( " + treeMessage + " ) : " + filesMessage;

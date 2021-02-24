@@ -52,7 +52,7 @@ namespace GitImporter
                     if( namedVersion.Version.Element.IsSolo )
                     {
                         //This is the only version of this element, and it is at \main\0.
-                        // Normally we would not want to keep \main\0, but becasue this is the only element, we do keep it
+                        // Normally we would not want to keep \main\0, but because this is the only element, we do keep it
                     }else{
                         continue;
                     }
@@ -69,7 +69,7 @@ namespace GitImporter
                         if( namedVersion.Version.Element.IsSolo )
                         {
                             //This is the only version of this element, and it is at \main\0.
-                            // Normally we would not want to keep \main\0, but becasue this is the only element, we do keep it
+                            // Normally we would not want to keep \main\0, but because this is the only element, we do keep it
                         }else{
                             continue;
                         }

@@ -1,12 +1,12 @@
 # Import ClearCase to Git
 
-This tool is based on the excellent work of [lanfeust69](https://github.com/lanfeust69) with the [clearcase-to-git-importer](https://github.com/lanfeust69/clearcase-to-git) and is able to import a ClearCase VOB to a Git repository (or several different repositories). 
+This tool is based on the excellent work of [lanfeust69](https://github.com/lanfeust69) with the [clearcase-to-git-importer](https://github.com/lanfeust69/clearcase-to-git) and is able to import a ClearCase VOB to a Git repository (or several repositories).
 
-It has been tested on a ClearCase VOB with 17 years of history resulting in a Git repository with a size of ~500MB. The import time was about 2-3 days. It has also been tested on a much smaller VOB that imported in some hours.
+It has been tested on a ClearCase VOB with 17 years of history resulting in a Git repository with a size of ~500 MB. The import time was about 2-3 days. It has also been tested on a much smaller VOB that imported in some hours.
 
 ## Major differences in this fork from lanfeust69
 
-- Without doubt lower code base quality since I'm unfamiliar with C# and I didn't bother to clean up the code (sorry).
+- Without a doubt lower code base quality since I'm unfamiliar with C#, and I didn't bother to clean up the code (sorry).
 - Supports extracting subfolders in the VOB to different Git repositories.
 - Will drop useless or empty commits and labels.
 - Significantly more aggressive with merging multiple ClearCase checkins to a Git commit.

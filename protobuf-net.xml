@@ -213,7 +213,7 @@
         <member name="T:ProtoBuf.Extensible">
             <summary>
             Simple base class for supporting unexpected fields allowing
-            for loss-less round-tips/merge, even if the data is not understod.
+            for loss-less round-tips/merge, even if the data is not understood.
             The additional fields are (by default) stored in-memory in a buffer.
             </summary>
             <remarks>As an example of an alternative implementation, you might
@@ -272,7 +272,7 @@
             Appends the value as an additional (unexpected) data-field for the instance.
             Note that for non-repeated sub-objects, this equates to a merge operation;
             for repeated sub-objects this adds a new instance to the set; for simple
-            values the new value supercedes the old value.
+            values the new value supersedes the old value.
             </summary>
             <remarks>Note that appending a value does not remove the old value from
             the stream; avoid repeatedly appending values for the same field.</remarks>
@@ -286,7 +286,7 @@
             Appends the value as an additional (unexpected) data-field for the instance.
             Note that for non-repeated sub-objects, this equates to a merge operation;
             for repeated sub-objects this adds a new instance to the set; for simple
-            values the new value supercedes the old value.
+            values the new value supersedes the old value.
             </summary>
             <remarks>Note that appending a value does not remove the old value from
             the stream; avoid repeatedly appending values for the same field.</remarks>
@@ -301,7 +301,7 @@
             Appends the value as an additional (unexpected) data-field for the instance.
             Note that for non-repeated sub-objects, this equates to a merge operation;
             for repeated sub-objects this adds a new instance to the set; for simple
-            values the new value supercedes the old value.
+            values the new value supersedes the old value.
             </summary>
             <remarks>Note that appending a value does not remove the old value from
             the stream; avoid repeatedly appending values for the same field.</remarks>
@@ -402,9 +402,9 @@
         <member name="T:ProtoBuf.ExtensibleUtil">
             <summary>
             This class acts as an internal wrapper allowing us to do a dynamic
-            methodinfo invoke; an't put into Serializer as don't want on public
+            methodinfo invoke; can't put into Serializer as don't want on public
             API; can't put into Serializer&lt;T&gt; since we need to invoke
-            accross classes, which isn't allowed in Silverlight)
+            across classes, which isn't allowed in Silverlight)
             </summary>
         </member>
         <member name="M:ProtoBuf.ExtensibleUtil.GetExtendedValues``1(ProtoBuf.IExtensible,System.Int32,ProtoBuf.DataFormat,System.Boolean,System.Boolean)">
@@ -459,7 +459,7 @@
         <member name="F:ProtoBuf.ImplicitFields.None">
             <summary>
             No members are serialized implicitly; all members require a suitable
-            attribute such as [ProtoMember]. This is the recmomended mode for
+            attribute such as [ProtoMember]. This is the recommended mode for
             most scenarios.
             </summary>
         </member>
@@ -519,7 +519,7 @@
         </member>
         <member name="M:ProtoBuf.Meta.MetaType.SetCallbacks(System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo,System.Reflection.MethodInfo)">
             <summary>
-            Assigns the callbacks to use during serialiation/deserialization.
+            Assigns the callbacks to use during serialization/deserialization.
             </summary>
             <param name="beforeSerialize">The method (or null) called before serialization begins.</param>
             <param name="afterSerialize">The method (or null) called when serialization is complete.</param>
@@ -529,7 +529,7 @@
         </member>
         <member name="M:ProtoBuf.Meta.MetaType.SetCallbacks(System.String,System.String,System.String,System.String)">
             <summary>
-            Assigns the callbacks to use during serialiation/deserialization.
+            Assigns the callbacks to use during serialization/deserialization.
             </summary>
             <param name="beforeSerialize">The name of the method (or null) called before serialization begins.</param>
             <param name="afterSerialize">The name of the method (or null) called when serialization is complete.</param>
@@ -611,7 +611,7 @@
         </member>
         <member name="P:ProtoBuf.Meta.MetaType.IncludeSerializerMethod">
             <summary>
-            When used to compile a model, should public serialization/deserialzation methods
+            When used to compile a model, should public serialization/deserialization methods
             be included for this type?
             </summary>
         </member>
@@ -655,18 +655,18 @@
         </member>
         <member name="P:ProtoBuf.Meta.MetaType.Item(System.Int32)">
             <summary>
-            Returns the ValueMember that matchs a given field number, or null if not found
+            Returns the ValueMember that matches a given field number, or null if not found
             </summary>
         </member>
         <member name="P:ProtoBuf.Meta.MetaType.Item(System.Reflection.MemberInfo)">
             <summary>
-            Returns the ValueMember that matchs a given member (property/field), or null if not found
+            Returns the ValueMember that matches a given member (property/field), or null if not found
             </summary>
         </member>
         <member name="P:ProtoBuf.Meta.MetaType.EnumPassthru">
             <summary>
             Gets or sets a value indicating that an enum should be treated directly as an int/short/etc, rather
-            than enforcing .proto enum rules. This is useful *in particul* for [Flags] enums.
+            than enforcing .proto enum rules. This is useful *in particular* for [Flags] enums.
             </summary>
         </member>
         <member name="P:ProtoBuf.Meta.MetaType.IgnoreListHandling">
@@ -1040,7 +1040,7 @@
         <member name="M:ProtoBuf.Meta.RuntimeTypeModel.Add(System.Type,System.Boolean)">
             <summary>
             Adds support for an additional type in this model, optionally
-            appplying inbuilt patterns. If the type is already known to the
+            applying inbuilt patterns. If the type is already known to the
             model, the existing type is returned **without** applying
             any additional behaviour.
             </summary>
@@ -1129,8 +1129,8 @@
         <member name="P:ProtoBuf.Meta.RuntimeTypeModel.UseImplicitZeroDefaults">
             <summary>
             Global switch that enables or disables the implicit
-            handling of "zero defaults"; meanning: if no other default is specified,
-            it assumes bools always default to false, integers to zero, etc.
+            handling of "zero defaults"; meaning: if no other default is specified,
+            it assumes booleans always default to false, integers to zero, etc.
             
             If this is disabled, no such assumptions are made and only *explicit*
             default values are processed. This is enabled by default to 
@@ -1197,13 +1197,13 @@
             Creates a new SubType instance.
             </summary>
             <param name="fieldNumber">The field-number that is used to encapsulate the data (as a nested
-            message) for the derived dype.</param>
+            message) for the derived type.</param>
             <param name="derivedType">The sub-type to be considered.</param>
         </member>
         <member name="P:ProtoBuf.Meta.SubType.FieldNumber">
             <summary>
             The field-number that is used to encapsulate the data (as a nested
-            message) for the derived dype.
+            message) for the derived type.
             </summary>
         </member>
         <member name="P:ProtoBuf.Meta.SubType.DerivedType">
@@ -1296,7 +1296,7 @@
         <member name="P:ProtoBuf.Meta.ValueMember.DataFormat">
             <summary>
             Specifies the rules used to process the field; this is used to determine the most appropriate
-            wite-type, but also to describe subtypes <i>within</i> that wire-type (such as SignedVariant)
+            write-type, but also to describe subtypes <i>within</i> that wire-type (such as SignedVariant)
             </summary>
         </member>
         <member name="P:ProtoBuf.Meta.ValueMember.IsStrict">
@@ -1314,7 +1314,7 @@
         </member>
         <member name="P:ProtoBuf.Meta.ValueMember.OverwriteList">
             <summary>
-            Indicates whether this field should *repace* existing values (the default is false, meaning *append*).
+            Indicates whether this field should *replace* existing values (the default is false, meaning *append*).
             This option only applies to list/array data.
             </summary>
         </member>
@@ -1382,12 +1382,12 @@
         <member name="P:ProtoBuf.ProtoContractAttribute.ImplicitFirstTag">
             <summary>
             Gets or sets the fist offset to use with implicit field tags;
-            only uesd if ImplicitFields is set.
+            only used if ImplicitFields is set.
             </summary>
         </member>
         <member name="P:ProtoBuf.ProtoContractAttribute.UseProtoMembersOnly">
             <summary>
-            If specified, alternative contract markers (such as markers for XmlSerailizer or DataContractSerializer) are ignored.
+            If specified, alternative contract markers (such as markers for XmlSerializer or DataContractSerializer) are ignored.
             </summary>
         </member>
         <member name="P:ProtoBuf.ProtoContractAttribute.IgnoreListHandling">
@@ -1473,13 +1473,13 @@
         <member name="T:ProtoBuf.ProtoIgnoreAttribute">
             <summary>
             Indicates that a member should be excluded from serialization; this
-            is only normally used when using implict fields.
+            is only normally used when using implicit fields.
             </summary>
         </member>
         <member name="T:ProtoBuf.ProtoPartialIgnoreAttribute">
             <summary>
             Indicates that a member should be excluded from serialization; this
-            is only normally used when using implict fields. This allows
+            is only normally used when using implicit fields. This allows
             ProtoIgnoreAttribute usage
             even for partial classes where the individual members are not
             under direct control.
@@ -1535,7 +1535,7 @@
         </member>
         <member name="P:ProtoBuf.ProtoIncludeAttribute.DataFormat">
             <summary>
-            Specifies whether the inherited sype's sub-message should be
+            Specifies whether the inherited type's sub-message should be
             written with a length-prefix (default), or with group markers.
             </summary>
         </member>
@@ -1592,7 +1592,7 @@
         </member>
         <member name="P:ProtoBuf.ProtoMemberAttribute.OverwriteList">
             <summary>
-            Indicates whether this field should *repace* existing values (the default is false, meaning *append*).
+            Indicates whether this field should *replace* existing values (the default is false, meaning *append*).
             This option only applies to list/array data.
             </summary>
         </member>
@@ -1643,7 +1643,7 @@
         </member>
         <member name="F:ProtoBuf.MemberSerializationOptions.OverwriteList">
             <summary>
-            Indicates whether this field should *repace* existing values (the default is false, meaning *append*).
+            Indicates whether this field should *replace* existing values (the default is false, meaning *append*).
             This option only applies to list/array data.
             </summary>
         </member>
@@ -1767,7 +1767,7 @@
             <summary>
             Begins consuming a nested message in the stream; supported wire-types: StartGroup, String
             </summary>
-            <remarks>The token returned must be help and used when callining EndSubItem</remarks>
+            <remarks>The token returned must be help and used when calling EndSubItem</remarks>
         </member>
         <member name="M:ProtoBuf.ProtoReader.ReadFieldHeader">
             <summary>
@@ -1842,7 +1842,7 @@
         </member>
         <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Byte[],System.Int32,System.Int32)">
             <summary>
-            Reads a string (of a given lenth, in bytes) directly from the source into a pre-existing buffer. An exception is thrown if the data is not all available.
+            Reads a string (of a given length, in bytes) directly from the source into a pre-existing buffer. An exception is thrown if the data is not all available.
             </summary>
         </member>
         <member name="M:ProtoBuf.ProtoReader.DirectReadBytes(System.IO.Stream,System.Int32)">
@@ -1852,7 +1852,7 @@
         </member>
         <member name="M:ProtoBuf.ProtoReader.DirectReadString(System.IO.Stream,System.Int32)">
             <summary>
-            Reads a string (of a given lenth, in bytes) directly from the source. An exception is thrown if the data is not all available.
+            Reads a string (of a given length, in bytes) directly from the source. An exception is thrown if the data is not all available.
             </summary>
         </member>
         <member name="M:ProtoBuf.ProtoReader.ReadLengthPrefix(System.IO.Stream,System.Boolean,ProtoBuf.PrefixStyle,System.Int32@,System.Int32@)">
@@ -1917,7 +1917,7 @@
         </member>
         <member name="M:ProtoBuf.ProtoWriter.WriteObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
             <summary>
-            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type).
+            Write an encapsulated sub-object, using the supplied unique key (representing a type).
             </summary>
             <param name="value">The object to write.</param>
             <param name="key">The key that uniquely identifies the type within the model.</param>
@@ -1925,7 +1925,7 @@
         </member>
         <member name="M:ProtoBuf.ProtoWriter.WriteRecursionSafeObject(System.Object,System.Int32,ProtoBuf.ProtoWriter)">
             <summary>
-            Write an encapsulated sub-object, using the supplied unique key (reprasenting a type) - but the
+            Write an encapsulated sub-object, using the supplied unique key (representing a type) - but the
             caller is asserting that this relationship is non-recursive; no recursion check will be
             performed.
             </summary>
@@ -2180,7 +2180,7 @@
             <typeparam name="TFrom">The type of the object being copied.</typeparam>
             <typeparam name="TTo">The type of the new object to be created.</typeparam>
             <param name="instance">The existing instance to use as a template.</param>
-            <returns>A new instane of type TNewType, with the data from TOldType.</returns>
+            <returns>A new instance of type TNewType, with the data from TOldType.</returns>
         </member>
         <member name="M:ProtoBuf.Serializer.Serialize``1(System.Runtime.Serialization.SerializationInfo,``0)">
             <summary>
@@ -2480,7 +2480,7 @@
         </member>
         <member name="T:ProtoBuf.ServiceModel.ProtoBehaviorExtension">
             <summary>
-            Configuration element to swap out DatatContractSerilaizer with the XmlProtoSerializer for a given endpoint.
+            Configuration element to swap out DataContractSerializer with the XmlProtoSerializer for a given endpoint.
             </summary>
             <seealso cref="T:ProtoBuf.ServiceModel.ProtoEndpointBehavior"/>
         </member>
@@ -2502,7 +2502,7 @@
         </member>
         <member name="T:ProtoBuf.ServiceModel.ProtoEndpointBehavior">
             <summary>
-            Behavior to swap out DatatContractSerilaizer with the XmlProtoSerializer for a given endpoint.
+            Behavior to swap out DataContractSerializer with the XmlProtoSerializer for a given endpoint.
              <example>
             Add the following to the server and client app.config in the system.serviceModel section:
              <behaviors>
