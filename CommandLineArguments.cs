@@ -997,7 +997,7 @@ namespace CommandLine
                     currentArg.Length = 0;
                 }
             }
-            catch (System.IndexOutOfRangeException)
+            catch (IndexOutOfRangeException)
             {
                 // got EOF 
                 if (inQuotes)
@@ -1086,7 +1086,7 @@ namespace CommandLine
                 type.IsEnum);
         }
         
-        [System.Diagnostics.DebuggerDisplay("Name = {LongName}")]
+        [DebuggerDisplay("Name = {LongName}")]
         private class Argument
         {
             public Argument(ArgumentAttribute attribute, FieldInfo field, ErrorReporter reporter)
@@ -1281,7 +1281,7 @@ namespace CommandLine
                 else
                 {
                     bool first = true;
-                    foreach (object o in (System.Array) value)
+                    foreach (object o in (Array) value)
                     {
                         if (!first)
                         {
